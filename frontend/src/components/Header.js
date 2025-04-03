@@ -2,22 +2,26 @@ import React from 'react';
 import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
+import { Route } from 'react-router-dom';
+import { useTranslation } from '../hooks/useTranslation';
 
 // Redux action
 import { logout } from '../redux/actions/userActions';
 
 // Components
 import SearchBox from './SearchBox';
+import LanguageToggle from './LanguageToggle';
 
 const Header = () => {
     const userLogin = useSelector(state => state.userLogin);
     const dispatch = useDispatch();
     const { userInfo } = userLogin;
-    
+    const { t } = useTranslation();
+
     const logoutHandler = () => {
         dispatch(logout());
     }
-    
+
     return <header>
         <Navbar bg='dark' variant='dark' expand='lg' collapseOnSelect>
             <Container>
@@ -26,55 +30,49 @@ const Header = () => {
                 </LinkContainer>
                 <Navbar.Toggle aria-controls='basic-navbar-nav' />
                 <Navbar.Collapse id='basic-navbar-nav'>
-                    <SearchBox />
+                    <Route render={({ history }) => <SearchBox history={history} />} />
                     <Nav className='ml-auto'>
                         <LinkContainer to='/cart'>
                             <Nav.Link>
-                                <i className='fas fa-shopping-cart'></i> Cart
+                                <i className='fas fa-shopping-cart'></i> {t('cart')}
                             </Nav.Link>
                         </LinkContainer>
-                        
+
                         {/* Rendering dropdown or sign in option based on whether user is logged in or not */}
                         {userInfo ? (
                             <NavDropdown title={userInfo.name} id='username'>
                                 <LinkContainer to='/profile'>
-                                    <NavDropdown.Item>
-                                       Profile 
-                                    </NavDropdown.Item>
+                                    <NavDropdown.Item>{t('profile')}</NavDropdown.Item>
                                 </LinkContainer>
-                                <NavDropdown.Item onClick={logoutHandler}>Logout</NavDropdown.Item>
+                                <NavDropdown.Item onClick={logoutHandler}>
+                                    {t('logout')}
+                                </NavDropdown.Item>
                             </NavDropdown>
                         ) : (
                             <LinkContainer to='/login'>
-                            <Nav.Link>
-                                <i className='fas fa-user'></i> Sign In
-                            </Nav.Link>
-                        </LinkContainer>
+                                <Nav.Link>
+                                    <i className='fas fa-user'></i> {t('login')}
+                                </Nav.Link>
+                            </LinkContainer>
                         )}
-                        
+
                         {/* Rendering admin menu based on whether logged in user is admin or not */}
-                        {userInfo && userInfo.isAdmin ? (
-                            <NavDropdown title='Admin Menu' id='admin'>
+                        {userInfo && userInfo.isAdmin && (
+                            <NavDropdown title='Admin' id='adminmenu'>
                                 <LinkContainer to='/admin/userlist'>
-                                    <NavDropdown.Item>
-                                       Users
-                                    </NavDropdown.Item>
+                                    <NavDropdown.Item>{t('users')}</NavDropdown.Item>
                                 </LinkContainer>
                                 <LinkContainer to='/admin/productlist'>
-                                    <NavDropdown.Item>
-                                       Products
-                                    </NavDropdown.Item>
+                                    <NavDropdown.Item>{t('products')}</NavDropdown.Item>
                                 </LinkContainer>
                                 <LinkContainer to='/admin/orderlist'>
-                                    <NavDropdown.Item>
-                                       Orders
-                                    </NavDropdown.Item>
+                                    <NavDropdown.Item>{t('orders')}</NavDropdown.Item>
                                 </LinkContainer>
                             </NavDropdown>
-                        ) : (
-                            <></>
                         )}
-                        
+
+                        <LanguageToggle />
+
                     </Nav>
                 </Navbar.Collapse>
             </Container>

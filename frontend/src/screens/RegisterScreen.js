@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { Row, Col, Form, Button } from 'react-bootstrap';
-
-// Components
+import { Form, Button, Row, Col } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
 import Message from '../components/Message';
 import LoadingSpinner from '../components/LoadingSpinner';
 import FormContainer from '../components/UI/FormContainer';
-import Meta from '../components/Meta';
-
-// Redux actions
 import { register } from '../redux/actions/userActions';
+import { useTranslation } from '../hooks/useTranslation';
 
 const RegisterScreen = (props) => {
     const [name, setName] = useState('');
@@ -18,86 +14,90 @@ const RegisterScreen = (props) => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [message, setMessage] = useState(null);
-
     const dispatch = useDispatch();
     const userRegister = useSelector(state => state.userRegister);
     const { loading, error, userInfo } = userRegister;
+    const { t } = useTranslation();
 
-    // If there is a ?redirect or not (redirect to shipping for newly registered users who register after clicking checkout)
     const redirect = props.location.search ? props.location.search.split('=')[1] : '/';
 
-    // If user is already logged in or got logged in after registration
     useEffect(() => {
-        if(userInfo) {
+        if (userInfo) {
             props.history.push(redirect);
         }
-    }, [userInfo, props.history, redirect]);
+    }, [props.history, userInfo, redirect]);
 
     const submitHandler = (e) => {
         e.preventDefault();
         if (password !== confirmPassword) {
-            setMessage('Passwords do not match');
-        }
-        else {
+            setMessage(t('passwordsDoNotMatch'));
+        } else {
             dispatch(register(name, email, password));
         }
     }
 
+    return (
+        <FormContainer>
+            <h1>{t('register')}</h1>
+            {message && <Message variant='danger' message={message} />}
+            {error && <Message variant='danger' message={error} />}
+            {loading && <LoadingSpinner />}
+            <Form onSubmit={submitHandler}>
+                <Form.Group controlId='name'>
+                    <Form.Label>{t('name')}</Form.Label>
+                    <Form.Control
+                        type='name'
+                        placeholder={t('enterName')}
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                    ></Form.Control>
+                </Form.Group>
 
-    return <FormContainer>
-        <Meta title='ProShop | Register' />
-        <h1>Register</h1>
-        {message && <Message message={message} />}
-        {error && <Message message={error} />}
-        {loading && <LoadingSpinner />}
-        <Form onSubmit={submitHandler}>
-            <Form.Group controlId='name'>
-                <Form.Label>Name</Form.Label>
-                <Form.Control
-                    type='name'
-                    placeholder='Enter your name'
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                ></Form.Control>
-            </Form.Group>
-            <Form.Group controlId='email'>
-                <Form.Label>Email Address</Form.Label>
-                <Form.Control
-                    type='email'
-                    placeholder='Enter email'
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                ></Form.Control>
-            </Form.Group>
+                <Form.Group controlId='email'>
+                    <Form.Label>{t('email')}</Form.Label>
+                    <Form.Control
+                        type='email'
+                        placeholder={t('enterEmail')}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    ></Form.Control>
+                </Form.Group>
 
-            <Form.Group controlId='password'>
-                <Form.Label>Password</Form.Label>
-                <Form.Control
-                    type='password'
-                    placeholder='Enter password'
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                ></Form.Control>
-            </Form.Group>
-            <Form.Group controlId='confirmPassword'>
-                <Form.Label>Confirm Password</Form.Label>
-                <Form.Control
-                    type='password'
-                    placeholder='Confirm your password'
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                ></Form.Control>
-            </Form.Group>
+                <Form.Group controlId='password'>
+                    <Form.Label>{t('password')}</Form.Label>
+                    <Form.Control
+                        type='password'
+                        placeholder={t('enterPassword')}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    ></Form.Control>
+                </Form.Group>
 
-            <Button type='submit' variant='primary' className='my-3'>Register</Button>
-        </Form>
+                <Form.Group controlId='confirmPassword'>
+                    <Form.Label>{t('confirmPassword')}</Form.Label>
+                    <Form.Control
+                        type='password'
+                        placeholder={t('confirmPassword')}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                    ></Form.Control>
+                </Form.Group>
 
-        <Row className='py-3'>
-            <Col>
-                Have an account?{' '}<Link to={redirect ? `/login?redirect=${redirect}` : '/login'}>Sign In</Link>
-            </Col>
-        </Row>
-    </FormContainer>
+                <Button type='submit' variant='primary'>
+                    {t('register')}
+                </Button>
+            </Form>
+
+            <Row className='py-3'>
+                <Col>
+                    {t('haveAccount')}{' '}
+                    <Link to={redirect ? `/login?redirect=${redirect}` : '/login'}>
+                        {t('login')}
+                    </Link>
+                </Col>
+            </Row>
+        </FormContainer>
+    )
 }
 
 export default RegisterScreen;

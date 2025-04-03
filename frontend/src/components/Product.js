@@ -1,28 +1,34 @@
 import React from 'react';
 import { Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-
-// Component
 import Rating from './Rating';
+import { useTranslation } from '../hooks/useTranslation';
 
-const Product = (props) => {
+const Product = ({ product }) => {
+    const { t } = useTranslation();
+
     return <Card className='my-3 p-3 rounded'>
-        <Link to={`/product/${props.product._id}`}>
-            <Card.Img src={props.product.image} variant='top' />
+        <Link to={`/product/${product._id}`}>
+            <Card.Img src={product.image} variant='top' />
         </Link>
 
         <Card.Body>
-            <Link to={`/product/${props.product._id}`}>
+            <Link to={`/product/${product._id}`}>
                 <Card.Title as='div'>
-                    <strong>{props.product.name}</strong>
+                    <strong>{product.name}</strong>
                 </Card.Title>
             </Link>
 
             <Card.Text as='div'>
-                <Rating value={props.product.rating} text={`${props.product.numReviews} reviews`} />
+                <Rating
+                    value={product.rating}
+                    text={`${product.numReviews} ${t('reviews')}`}
+                />
             </Card.Text>
 
-            <Card.Text as='h3'>${props.product.price}</Card.Text>
+            <Card.Text as='h3'>
+                {product.price ? product.price.toLocaleString('vi-VN') : 0} VNĐ
+            </Card.Text>
         </Card.Body>
     </Card>
 }
