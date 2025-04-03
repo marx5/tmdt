@@ -1,64 +1,72 @@
 import React, { useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-
-// Components
 import FormContainer from '../components/UI/FormContainer';
 import CheckoutSteps from '../components/CheckoutSteps';
-
-// Redux actions
 import { saveShippingAddress } from '../redux/actions/cartActions';
+import { useTranslation } from '../hooks/useTranslation';
 
 const ShippingScreen = (props) => {
-    const dispatch = useDispatch();
     const cart = useSelector(state => state.cart);
-    const { shippingAddress } = cart; 
-    
-    const [address, setAddress] = useState(shippingAddress.address);
-    const [city, setCity] = useState(shippingAddress.city);
-    const [postalCode, setPostalCode] = useState(shippingAddress.postalCode);
-    
+    const { shippingAddress } = cart;
+    const { t } = useTranslation();
+
+    const [address, setAddress] = useState(shippingAddress.address || '');
+    const [city, setCity] = useState(shippingAddress.city || '');
+    const [postalCode, setPostalCode] = useState(shippingAddress.postalCode || '');
+
+    const dispatch = useDispatch();
+
     const submitHandler = (e) => {
         e.preventDefault();
-        if(address !== '' && city !== '' && postalCode !== '') {
-            dispatch(saveShippingAddress({address, city, postalCode}));
-            props.history.push('/payment');
-        }
+        dispatch(saveShippingAddress({ address, city, postalCode }));
+        props.history.push('/payment');
     }
-    
-    return <FormContainer>
-        <CheckoutSteps step1 step2 />
-        <h1>Shipping</h1>
-        <Form onSubmit={submitHandler}>
-        <Form.Group controlId='address'>
-            <Form.Label>Address</Form.Label>
-            <Form.Control
-                type='text'
-                placeholder='Enter address'
-                value={address}
-                required
-                onChange={(e) => setAddress(e.target.value)}
-            ></Form.Control>
-            <Form.Label>City</Form.Label>
-            <Form.Control
-                type='text'
-                placeholder='Enter city'
-                value={city}
-                required
-                onChange={(e) => setCity(e.target.value)}
-            ></Form.Control>
-            <Form.Label>Postal Code</Form.Label>
-            <Form.Control
-                type='text'
-                placeholder='Enter Postal Code'
-                value={postalCode}
-                required
-                onChange={(e) => setPostalCode(e.target.value)}
-            ></Form.Control>
-        </Form.Group>
-        <Button type='submit' variant='primary' className='my-3'>Continue</Button>
-        </Form>
-    </FormContainer>
+
+    return (
+        <FormContainer>
+            <CheckoutSteps step1 step2 />
+            <h1>{t('shippingAddress')}</h1>
+            <Form onSubmit={submitHandler}>
+                <Form.Group controlId='address'>
+                    <Form.Label>{t('address')}</Form.Label>
+                    <Form.Control
+                        type='text'
+                        placeholder={t('enterAddress')}
+                        value={address}
+                        required
+                        onChange={(e) => setAddress(e.target.value)}
+                    ></Form.Control>
+                </Form.Group>
+
+                <Form.Group controlId='city'>
+                    <Form.Label>{t('city')}</Form.Label>
+                    <Form.Control
+                        type='text'
+                        placeholder={t('enterCity')}
+                        value={city}
+                        required
+                        onChange={(e) => setCity(e.target.value)}
+                    ></Form.Control>
+                </Form.Group>
+
+                <Form.Group controlId='postalCode'>
+                    <Form.Label>{t('postalCode')}</Form.Label>
+                    <Form.Control
+                        type='text'
+                        placeholder={t('enterPostalCode')}
+                        value={postalCode}
+                        required
+                        onChange={(e) => setPostalCode(e.target.value)}
+                    ></Form.Control>
+                </Form.Group>
+
+                <Button type='submit' variant='primary'>
+                    {t('continue')}
+                </Button>
+            </Form>
+        </FormContainer>
+    )
 }
 
 export default ShippingScreen;

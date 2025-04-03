@@ -1,22 +1,27 @@
 import * as cartConstants from '../constants/cartConstants';
 
-export const cartReducer = (state={ cartItems: [], shippingAddress: {} }, action) => {
-    switch(action.type) {
+export const cartReducer = (state = { cartItems: [], shippingAddress: {} }, action) => {
+    switch (action.type) {
         case cartConstants.CART_ADD_ITEM:
             const item = action.payload;
-            const exists = state.cartItems.find((p) => p.product === item.product);
-            if(exists) {
-                return {...state, cartItems: state.cartItems.map(x => x.product === exists.product ? item : x) };
+            const existItem = state.cartItems.find(x => x.product === item.product);
+            if (existItem) {
+                return { ...state, cartItems: state.cartItems.map(x => x.product === existItem.product ? item : x) };
             }
             else {
-                return {...state, cartItems: [...state.cartItems, item]};
+                return { ...state, cartItems: [...state.cartItems, item] };
             }
         case cartConstants.CART_REMOVE_ITEM:
-            return {...state, cartItems: state.cartItems.filter(item => item.product !== action.payload)};
+            return { ...state, cartItems: state.cartItems.filter(x => x.product !== action.payload) };
         case cartConstants.CART_SAVE_SHIPPING_ADDRESS:
-            return {...state, shippingAddress: action.payload};
+            return { ...state, shippingAddress: action.payload };
         case cartConstants.CART_SAVE_PAYMENT_METHOD:
-            return { ...state, paymentMethod: action.payload}
+            return { ...state, paymentMethod: action.payload }
+        case cartConstants.CART_CLEAR_ITEMS:
+            return {
+                ...state,
+                cartItems: []
+            }
         default:
             return state;
     }

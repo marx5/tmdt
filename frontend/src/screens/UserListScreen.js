@@ -15,38 +15,38 @@ const UserListScreen = (props) => {
     const dispatch = useDispatch();
     const usersList = useSelector(state => state.usersList);
     const { loading, error, users } = usersList;
-    
+
     const userLogin = useSelector(state => state.userLogin);
     const { userInfo } = userLogin;
-    
+
     useEffect(() => {
-        if(userInfo && userInfo.isAdmin) {
+        if (userInfo && userInfo.isAdmin) {
             dispatch(getUsers());
         }
         else {
             props.history.push('/login');
         }
     }, [dispatch]);
-    
+
     const userDeleteHandler = async (id) => {
-        if(window.confirm('Are you sure want to delete this user?')) {
+        if (window.confirm('Are you sure want to delete this user?')) {
             await dispatch(deleteUser(id));
             dispatch(getUsers());
         }
     }
-    
+
     return <>
         <Meta title='Users List' />
-        <h1>Users</h1>
+        <h1>Người dùng</h1>
         {loading ? <LoadingSpinner /> : error ? <Message variant='danger' message={error} /> : (
-            <Table striped bordered hover responsive>
+            <Table striped bordered hover responsive className='table-sm'>
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Name</th>
+                        <th>Họ tên</th>
                         <th>Email</th>
                         <th>Admin</th>
-                        <th>Edit</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -56,13 +56,13 @@ const UserListScreen = (props) => {
                             <td>{user.name}</td>
                             <td><a href={`mailto:${user.email}`}>{user.email}</a></td>
                             <td>
-                                { user.isAdmin ?
-                                (<i className='fas fa-check' style={{ color: 'green' }} />) 
-                                :
-                                (<i className='fas fa-times' style={{ color: 'red' }} />) }
+                                {user.isAdmin ?
+                                    (<i className='fas fa-check' style={{ color: 'green' }} />)
+                                    :
+                                    (<i className='fas fa-times' style={{ color: 'red' }} />)}
                             </td>
                             <td>
-                                <LinkContainer to={`/users/${user._id}/edit`}>
+                                <LinkContainer to={`/admin/user/${user._id}/edit`}>
                                     <Button variant='light' className='btn-sm'><i className='fas fa-edit' /></Button>
                                 </LinkContainer>
                                 <Button

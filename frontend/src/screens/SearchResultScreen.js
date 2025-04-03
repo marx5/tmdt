@@ -15,7 +15,7 @@ const SearchResultScreen = (props) => {
     const keyword = props.location.search.split('=')[1];
 
     useEffect(() => {
-        // Fetching the keyword search from backend
+        // Lấy kết quả tìm kiếm từ backend
         const getSearchResult = async () => {
             try {
                 setLoading(true);
@@ -32,18 +32,18 @@ const SearchResultScreen = (props) => {
     }, [keyword]);
 
     return <>
-        <Meta title='Search Results' />
-        <h3>Search results for "{keyword}"...</h3>
-        {/* While loading */}
+        <Meta title='Kết quả tìm kiếm' />
+        <h3>Kết quả tìm kiếm cho "{keyword}"...</h3>
+        {/* Đang tải */}
         {loading && <LoadingSpinner />}
 
-        {/* Error */}
+        {/* Lỗi */}
         {error && <Message message={error} />}
-        
-        {/* Not loading, no error and products fetched for the search */}
+
+        {/* Không tải, không lỗi và có sản phẩm tìm thấy */}
         {!loading && !error && products.length > 0 && (
             <Row>
-                {/* Rendering the products in columns */}
+                {/* Hiển thị sản phẩm theo cột */}
                 {products.map((product) => {
                     return <Col key={product._id} sm={12} md={6} lg={4} xl={3}>
                         <Product product={product} />
@@ -51,10 +51,10 @@ const SearchResultScreen = (props) => {
                 })}
             </Row>)
         }
-        
-        {/* Not loading, no error and no products fetched for the search */}
+
+        {/* Không tải, không lỗi và không có sản phẩm tìm thấy */}
         {!loading && !error && products.length === 0 && (
-            <Message variant='info' message={`No product found for ${keyword}`} />
+            <Message variant='info' message={`Không tìm thấy sản phẩm nào cho từ khóa "${keyword}"`} />
         )}
 
     </>
