@@ -7,6 +7,7 @@ const LanguageContext = createContext();
 export const languages = {
     VI: 'vi',
     EN: 'en',
+    ZH: 'zh',
 };
 
 // Provider component
@@ -24,10 +25,13 @@ export const LanguageProvider = ({ children }) => {
 
     // Hàm chuyển đổi ngôn ngữ
     const toggleLanguage = () => {
-        setLanguage(prevLang =>
-            prevLang === languages.VI ? languages.EN : languages.VI
-        );
+        setLanguage(prevLang => {
+            if (prevLang === languages.VI) return languages.EN;
+            if (prevLang === languages.EN) return languages.ZH;
+            return languages.VI;
+        });
     };
+
 
     return (
         <LanguageContext.Provider value={{ language, toggleLanguage }}>

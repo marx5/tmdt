@@ -1,8 +1,9 @@
 import express from 'express';
-import asyncHandler from 'express-async-handler'; 
+import asyncHandler from 'express-async-handler';
 
 // Model
 import Product from '../models/productModel.js'
+import Order from '../models/orderModel.js'
 
 // Auth middlewares
 import { protect, admin } from '../middleware/authMiddleware.js';
@@ -28,7 +29,7 @@ router.get('/toprated', asyncHandler(async (req, res) => {
 // @desc       Search for products
 // @route      GET /api/products/search?keyword=-----
 // @access     Private
-router.post('/search', asyncHandler(async (req, res) => {    
+router.post('/search', asyncHandler(async (req, res) => {
     const results = await Product.find({
         name: { $regex: req.query.keyword, $options: 'i' }
     });
@@ -41,7 +42,7 @@ router.post('/search', asyncHandler(async (req, res) => {
 // @access     Public
 router.get('/:id', asyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id);
-    if(product) {
+    if (product) {
         res.json(product);
     }
     else {
@@ -54,17 +55,17 @@ router.get('/:id', asyncHandler(async (req, res) => {
 // @access     Public
 router.delete('/:id', protect, admin, asyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id);
-    
-    if(product) {
+
+    if (product) {
         await product.remove();
         res.status(200);
-        res.json({ message : 'Product removed'});
+        res.json({ message: 'Product removed' });
     }
     else {
         res.status(404);
         throw new Error('Product not found');
     }
-    
+
 }));
 
 // @desc       Create a single product
@@ -83,7 +84,7 @@ router.post('/', protect, admin, asyncHandler(async (req, res) => {
         price: 0,
         countInStock: 0
     });
-    
+
     await product.save();
     res.status(201);
     res.json(product);
@@ -94,8 +95,8 @@ router.post('/', protect, admin, asyncHandler(async (req, res) => {
 // @access     Private/Admin
 router.put('/:id', protect, admin, asyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id);
-    
-    if(product) {
+
+    if (product) {
         product.name = req.body.name;
         product.image = req.body.image;
         product.brand = req.body.brand;
@@ -103,7 +104,7 @@ router.put('/:id', protect, admin, asyncHandler(async (req, res) => {
         product.description = req.body.description;
         product.price = req.body.price;
         product.countInStock = req.body.countInStock;
-        
+
         await product.save();
         res.status(200);
         res.json(product);
@@ -119,17 +120,38 @@ router.put('/:id', protect, admin, asyncHandler(async (req, res) => {
 // @access     Private
 router.post('/:id/reviews', protect, asyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id);
-    
-    if(product) {
-        const isReviewedByUser = product.reviews.find((review) => review.user.toString() === req.user._id.toString());
-        
-        // If this product is already reviewd by the user
-        if(isReviewedByUser) {
+
+    if (product) {
+        // Kiểm tra xem người dùng đã đánh giá sản phẩm này chưa
+        const isReviewedByUser = product.reviews.find(
+            (review) => review.user.toString() === req.user._id.toString()
+        );
+
+        // Nếu sản phẩm đã được đánh giá bởi người dùng
+        if (isReviewedByUser) {
             res.status(400);
-            throw new Error('Product is already reviewd by user');
+            throw new Error('Sản phẩm đã được đánh giá bởi bạn');
         }
-        
-        // Adding review
+
+        // Kiểm tra xem người dùng đã mua sản phẩm này chưa
+        const orders = await Order.find({
+            user: req.user._id,
+            isPaid: true // Chỉ xét các đơn hàng đã thanh toán
+        });
+
+        // Kiểm tra xem sản phẩm có trong bất kỳ đơn hàng nào của người dùng không
+        const hasPurchased = orders.some(order =>
+            order.orderItems.some(item =>
+                item.product.toString() === req.params.id
+            )
+        );
+
+        if (!hasPurchased) {
+            res.status(403);
+            throw new Error('Bạn cần mua sản phẩm trước khi đánh giá');
+        }
+
+        // Thêm đánh giá
         const review = {
             name: req.user.name,
             rating: Number(req.body.rating),
@@ -137,22 +159,22 @@ router.post('/:id/reviews', protect, asyncHandler(async (req, res) => {
             user: req.user._id
         };
         product.reviews.push(review);
-        
-        // Calculating the number of reviews
+
+        // Tính toán số lượng đánh giá
         product.numReviews = product.reviews.length;
-        
-        // Calculating the average rating
-        product.rating = product.reviews.reduce((acc, item) => item.rating, 0) / product.reviews.length;
-        
+
+        // Tính toán điểm đánh giá trung bình
+        product.rating = product.reviews.reduce((acc, item) => item.rating + acc, 0) / product.reviews.length;
+
         await product.save();
         res.status(201);
         res.json({
-            message: 'Review added to product'
+            message: 'Đánh giá đã được thêm vào sản phẩm'
         });
     }
     else {
         res.status(404);
-        throw new Error('Product not found');
+        throw new Error('Không tìm thấy sản phẩm');
     }
 }));
 

@@ -130,6 +130,8 @@ export const translations = {
         userUpdated: 'User updated successfully',
         userDeleted: 'User deleted successfully',
         orderDelivered: 'Order marked as delivered',
+        writeYourComment: 'Write your comment here...',
+        submitting: 'Submitting...',
     },
     vi: {
         // Header
@@ -262,5 +264,141 @@ export const translations = {
         userUpdated: 'Cập nhật người dùng thành công',
         userDeleted: 'Xóa người dùng thành công',
         orderDelivered: 'Đơn hàng đã được đánh dấu là đã giao',
+        writeYourComment: 'Viết bình luận của bạn tại đây...',
+        submitting: 'Đang gửi...',
+    },
+    zh: {
+        // Header
+        cart: '购物车',
+        login: '登录',
+        profile: '个人资料',
+        logout: '登出',
+        users: '用户',
+        products: '产品',
+        orders: '订单',
+        search: '搜索产品...',
+        searchButton: '搜索',
+
+        // Home
+        featuredProducts: '精选产品',
+        latestProducts: '最新产品',
+
+        // Product
+        reviews: '评论',
+        addToCart: '加入购物车',
+        status: '状态',
+        inStock: '有库存',
+        outOfStock: '缺货',
+        writeReview: '写评论',
+        reviewSubmitted: '评论已提交',
+        rating: '评分',
+        selectRating: '选择评分',
+        poor: '差',
+        fair: '一般',
+        good: '好',
+        veryGood: '很好',
+        excellent: '非常好',
+        comment: '评论',
+        submit: '提交',
+        pleaseLogin: '请登录以发表评论',
+        noReviews: '暂无评论',
+
+        // Cart
+        shoppingCart: '购物车',
+        emptyCart: '您的购物车是空的',
+        goBack: '返回',
+        price: '价格',
+        quantity: '数量',
+        proceedToCheckout: '继续结账',
+
+        // Auth
+        name: '姓名',
+        email: '电子邮件',
+        password: '密码',
+        confirmPassword: '确认密码',
+        register: '注册',
+        newCustomer: '新客户？',
+        haveAccount: '已有账户？',
+        enterEmail: '输入电子邮件',
+        enterPassword: '输入密码',
+        enterName: '输入姓名',
+        passwordsDoNotMatch: '密码不匹配',
+
+        // Shipping
+        shippingAddress: '送货地址',
+        address: '地址',
+        city: '城市',
+        postalCode: '邮政编码',
+        continue: '继续',
+        enterAddress: '输入地址',
+        enterCity: '输入城市',
+        enterPostalCode: '输入邮政编码',
+
+        // Payment
+        paymentMethod: '支付方式',
+        selectMethod: '选择支付方式',
+        paypal: 'PayPal 或信用卡',
+
+        // Place Order
+        orderSummary: '订单摘要',
+        items: '商品',
+        shipping: '运费',
+        tax: '税',
+        total: '总计',
+        placeOrder: '下订单',
+        orderItems: '订单商品',
+
+        // Order
+        orderId: '订单',
+        deliveryAddress: '送货地址',
+        notDelivered: '未送达',
+        delivered: '送达日期',
+        notPaid: '未支付',
+        paidOn: '支付日期',
+        markAsDelivered: '标记为已送达',
+
+        // Admin
+        edit: '编辑',
+        delete: '删除',
+        createProduct: '创建产品',
+        editProduct: '编辑产品',
+        editUser: '编辑用户',
+        productName: '产品名称',
+        brand: '品牌',
+        category: '类别',
+        countInStock: '库存数量',
+        description: '描述',
+        update: '更新',
+        isAdmin: '管理员',
+
+        // Profile
+        updateProfile: '更新个人资料',
+        myOrders: '我的订单',
+        orderDate: '订单日期',
+
+        // Search
+        searchResults: '搜索结果',
+        noProductsFound: '未找到相关产品',
+
+        // Pagination
+        previous: '上一页',
+        next: '下一页',
+
+        // Checkout Steps
+        signIn: '登录',
+        payment: '支付',
+        placeOrderStep: '下订单',
+
+        // Messages
+        profileUpdated: '个人资料更新成功',
+        orderPlaced: '订单提交成功',
+        productCreated: '产品创建成功',
+        productUpdated: '产品更新成功',
+        productDeleted: '产品删除成功',
+        userUpdated: '用户更新成功',
+        userDeleted: '用户删除成功',
+        orderDelivered: '订单已标记为送达',
+        writeYourComment: '在这里写下您的评论...',
+        submitting: '提交中...',
     }
 }; 
