@@ -12,14 +12,15 @@ import Meta from '../components/Meta';
 
 // Redux actions
 import { getOrderDetails, payOrder, deliverOrder } from '../redux/actions/orderActions';
+import { useTranslation } from '../hooks/useTranslation';
 
 const OrderScreen = (props) => {
     const orderID = props.match.params.id;
     const dispatch = useDispatch();
+    const { t } = useTranslation();
 
     // SDK ready state
     const [sdkReady, setSdkReady] = useState(false);
-
 
     const orderDetails = useSelector(state => state.orderDetails);
     const { order, loading, error } = orderDetails;
@@ -48,7 +49,7 @@ const OrderScreen = (props) => {
             document.body.appendChild(script);
         }
         // If order isn't loaded OR we make payment OR admin marks as delivered, we load order
-        if (!order || paySuccess || deliverSuccess) {
+        if (!order || paySuccess || deliverSuccess || (order && order._id !== orderID)) {
             // Without reset it will keep refreshing after payment due to paySuccess
             dispatch({ type: 'ORDER_PAY_RESET' });
             dispatch({ type: 'ORDER_DELIVER_RESET' });
@@ -79,47 +80,47 @@ const OrderScreen = (props) => {
     }
 
     return loading ? <LoadingSpinner /> : error ? <Message variant='danger' message={error} /> : <>
-        <Meta title={`Order ${order._id}`} />
-        <h1>Đơn hàng {order._id}</h1>
+        <Meta title={`${t('orderId')} ${order._id}`} />
+        <h1>{t('orderId')} {order._id}</h1>
         <Row>
             <Col md={8}>
                 <ListGroup variant='flush'>
                     <ListGroup.Item>
-                        <h2>Địa chỉ giao hàng</h2>
+                        <h2>{t('deliveryAddress')}</h2>
                         <p>
-                            <strong>Tên: </strong> {order.user.name}
+                            <strong>{t('name')}: </strong> {order.user.name}
                         </p>
                         <p>
-                            <strong>Email: </strong> <a href={`mailto:${order.user.email}`}>{order.user.email}</a>
+                            <strong>{t('email')}: </strong> <a href={`mailto:${order.user.email}`}>{order.user.email}</a>
                         </p>
                         <p>
-                            <strong>Địa chỉ: </strong>
+                            <strong>{t('address')}: </strong>
                             {order.shippingAddress.address}, {order.shippingAddress.city}{' '}
                             {order.shippingAddress.postalCode}
                         </p>
                         {order.isDelivered ? (
-                            <Message variant='success' message={`Đã giao hàng vào ${order.deliveredAt}`} />
+                            <Message variant='success' message={`${t('delivered')} ${order.deliveredAt}`} />
                         ) : (
-                            <Message variant='danger' message='Chưa giao hàng' />
+                            <Message variant='danger' message={t('notDelivered')} />
                         )}
                     </ListGroup.Item>
 
                     <ListGroup.Item>
-                        <h2>Phương thức thanh toán</h2>
+                        <h2>{t('paymentMethod')}</h2>
                         <p>
-                            <strong>Phương thức: </strong>
+                            <strong>{t('method')}: </strong>
                             {order.paymentMethod}
                         </p>
                         {order.isPaid ? (
-                            <Message variant='success' message={`Đã thanh toán vào ${order.paidAt}`} />
+                            <Message variant='success' message={`${t('paidOn')} ${order.paidAt}`} />
                         ) : (
-                            <Message variant='danger' message='Chưa thanh toán' />
+                            <Message variant='danger' message={t('notPaid')} />
                         )}
                     </ListGroup.Item>
 
                     <ListGroup.Item>
-                        <h2>Sản phẩm đặt mua</h2>
-                        {order.orderItems.length === 0 ? (<Message variant='info' message='Order is empty' />) : (
+                        <h2>{t('orderItems')}</h2>
+                        {order.orderItems.length === 0 ? (<Message variant='info' message={t('emptyCart')} />) : (
                             <ListGroup variant='flush'>
                                 {order.orderItems.map((item, index) => {
                                     return <ListGroup.Item key={index}>
@@ -147,29 +148,29 @@ const OrderScreen = (props) => {
                 <Card>
                     <ListGroup variant='flush'>
                         <ListGroup.Item>
-                            <h2>Tổng quan đơn hàng</h2>
+                            <h2>{t('orderSummary')}</h2>
                         </ListGroup.Item>
                         <ListGroup.Item>
                             <Row>
-                                <Col>Sản phẩm</Col>
+                                <Col>{t('items')}</Col>
                                 <Col>{order.itemsPrice.toLocaleString('vi-VN')} VNĐ</Col>
                             </Row>
                         </ListGroup.Item>
                         <ListGroup.Item>
                             <Row>
-                                <Col>Phí vận chuyển</Col>
+                                <Col>{t('shipping')}</Col>
                                 <Col>{order.shippingPrice.toLocaleString('vi-VN')} VNĐ</Col>
                             </Row>
                         </ListGroup.Item>
                         <ListGroup.Item>
                             <Row>
-                                <Col>Thuế</Col>
+                                <Col>{t('tax')}</Col>
                                 <Col>{order.taxPrice.toLocaleString('vi-VN')} VNĐ</Col>
                             </Row>
                         </ListGroup.Item>
                         <ListGroup.Item>
                             <Row>
-                                <Col>Tổng cộng</Col>
+                                <Col>{t('total')}</Col>
                                 <Col>{order.totalPrice.toLocaleString('vi-VN')} VNĐ</Col>
                             </Row>
                         </ListGroup.Item>
@@ -184,10 +185,10 @@ const OrderScreen = (props) => {
                                 />
                             )}
                         </ListGroup.Item>}
-                        {userInfo.isAdmin && order.isPaid && !order.isDelivered && (
+                        {userInfo && userInfo.isAdmin && order.isPaid && !order.isDelivered && (
                             <ListGroup.Item>
                                 <Button type='button' className='btn btn-block' onClick={handleMarkAsDelivered}>
-                                    Đánh dấu là đã giao hàng
+                                    {t('markAsDelivered')}
                                 </Button>
                             </ListGroup.Item>
                         )}
@@ -196,7 +197,6 @@ const OrderScreen = (props) => {
             </Col>
         </Row>
     </>
-
 }
 
 export default OrderScreen;

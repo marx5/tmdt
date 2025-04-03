@@ -70,6 +70,7 @@ const PlaceOrderScreen = (props) => {
 
                         <ListGroup.Item>
                             <h2>{t('paymentMethod')}</h2>
+                            <strong>{t('method')}: </strong>
                             {cart.paymentMethod}
                         </ListGroup.Item>
 

@@ -12,7 +12,8 @@ const LanguageToggle = () => {
             onClick={toggleLanguage}
             className="ml-2"
         >
-            {language === languages.VI ? 'EN' : 'VI'}
+            {language === languages.VI ? 'EN' : language === languages.EN ? '中文' : 'VI'}
+
         </Button>
     );
 };
