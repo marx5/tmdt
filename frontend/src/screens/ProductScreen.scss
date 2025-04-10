@@ -1,0 +1,304 @@
+.product {
+    &-container {
+        padding: 2rem;
+    }
+
+    &-back {
+        margin-bottom: 1rem;
+    }
+
+    &-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+
+        @media (max-width: 768px) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    &-gallery {
+        &-main {
+            margin-bottom: 1rem;
+            
+            img {
+                width: 100%;
+                height: auto;
+                border-radius: 8px;
+            }
+        }
+
+        &-thumbnails {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+
+            img {
+                width: 100%;
+                height: auto;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: opacity 0.3s;
+
+                &:hover {
+                    opacity: 0.8;
+                }
+            }
+        }
+    }
+
+    &-info {
+        &-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        &-rating {
+            margin-bottom: 1rem;
+        }
+
+        &-price {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+
+            &-original {
+                text-decoration: line-through;
+                color: #999;
+                margin-right: 1rem;
+            }
+
+            &-discount {
+                color: #dc3545;
+                font-weight: bold;
+            }
+
+            &-sale {
+                background-color: #dc3545;
+                color: white;
+                padding: 0.25rem 0.5rem;
+                border-radius: 4px;
+                margin-left: 1rem;
+                font-size: 0.875rem;
+            }
+        }
+
+        &-description {
+            margin-bottom: 1rem;
+            color: #666;
+        }
+    }
+
+    &-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+
+        .product-tag {
+            background-color: #f8f9fa;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            color: #666;
+        }
+    }
+
+    &-details {
+        margin-bottom: 2rem;
+
+        &-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+    }
+
+    &-colors {
+        &-title {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        &-list {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        &-item {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+
+            &.selected {
+                border-color: #000;
+                transform: scale(1.1);
+            }
+        }
+    }
+
+    &-sizes {
+        &-title {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        &-list {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        &-item {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+
+            &.selected {
+                background-color: #000;
+                color: white;
+                border-color: #000;
+            }
+
+            &.disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+        }
+    }
+
+    &-quantity {
+        &-title {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        &-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            .form-control {
+                width: 60px;
+                text-align: center;
+            }
+        }
+    }
+
+    &-specifications {
+        margin-bottom: 2rem;
+
+        .card-header {
+            font-weight: 500;
+        }
+
+        &-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+    }
+
+    &-reviews {
+        &-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        &-list {
+            margin-bottom: 2rem;
+        }
+
+        &-item {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+
+            &-header {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 0.5rem;
+            }
+
+            &-name {
+                font-weight: 500;
+            }
+
+            &-date {
+                color: #666;
+            }
+
+            &-comment {
+                margin-top: 0.5rem;
+                color: #666;
+            }
+        }
+
+        &-form {
+            &-title {
+                font-size: 1.25rem;
+                margin-bottom: 1rem;
+            }
+
+            &-rating {
+                margin-bottom: 1rem;
+            }
+
+            &-comment {
+                margin-bottom: 1rem;
+            }
+
+            &-submit {
+                width: 100%;
+            }
+        }
+    }
+
+    // Responsive styles
+    @media (max-width: 768px) {
+        &-content {
+            gap: 20px;
+        }
+
+        &-gallery {
+            &-thumbnails {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        &-info {
+            &-title {
+                font-size: 20px;
+            }
+
+            &-price {
+                font-size: 20px;
+            }
+        }
+    }
+
+    @media (max-width: 576px) {
+        &-gallery {
+            &-thumbnails {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        &-colors {
+            &-list {
+                flex-wrap: wrap;
+            }
+        }
+
+        &-sizes {
+            &-list {
+                flex-wrap: wrap;
+            }
+        }
+    }
+} 

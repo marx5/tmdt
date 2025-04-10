@@ -14,8 +14,42 @@ const router = express.Router();
 // @route      GET /api/products
 // @access     Public
 router.get('/', asyncHandler(async (req, res) => {
-    const products = await Product.find({});
-    res.json(products);
+    const pageSize = 10;
+    const page = Number(req.query.pageNumber) || 1;
+    const keyword = req.query.keyword ? {
+        name: {
+            $regex: req.query.keyword,
+            $options: 'i'
+        }
+    } : {};
+
+    const sortOption = req.query.sort || '';
+    let sortQuery = {};
+
+    switch (sortOption) {
+        case 'price_asc':
+            sortQuery = { price: 1 };
+            break;
+        case 'price_desc':
+            sortQuery = { price: -1 };
+            break;
+        case 'rating_desc':
+            sortQuery = { rating: -1 };
+            break;
+        case 'newest':
+            sortQuery = { createdAt: -1 };
+            break;
+        default:
+            sortQuery = { createdAt: -1 };
+    }
+
+    const count = await Product.countDocuments({ ...keyword });
+    const products = await Product.find({ ...keyword })
+        .sort(sortQuery)
+        .limit(pageSize)
+        .skip(pageSize * (page - 1));
+
+    res.json({ products, page, pages: Math.ceil(count / pageSize) });
 }));
 
 // @desc       Fetch top rated products
@@ -28,13 +62,17 @@ router.get('/toprated', asyncHandler(async (req, res) => {
 
 // @desc       Search for products
 // @route      GET /api/products/search?keyword=-----
-// @access     Private
-router.post('/search', asyncHandler(async (req, res) => {
-    const results = await Product.find({
-        name: { $regex: req.query.keyword, $options: 'i' }
-    });
-    res.status(200);
-    res.json(results);
+// @access     Public
+router.get('/search', asyncHandler(async (req, res) => {
+    const keyword = req.query.keyword ? {
+        name: {
+            $regex: req.query.keyword,
+            $options: 'i'
+        }
+    } : {};
+
+    const products = await Product.find({ ...keyword });
+    res.json(products);
 }));
 
 // @desc       Fetch a single product
@@ -52,20 +90,18 @@ router.get('/:id', asyncHandler(async (req, res) => {
 
 // @desc       Delete a single product
 // @route      DELETE /api/products/:id
-// @access     Public
+// @access     Private/Admin
 router.delete('/:id', protect, admin, asyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id);
 
     if (product) {
         await product.remove();
-        res.status(200);
         res.json({ message: 'Product removed' });
     }
     else {
         res.status(404);
         throw new Error('Product not found');
     }
-
 }));
 
 // @desc       Create a single product
@@ -83,13 +119,16 @@ router.post('/', protect, admin, asyncHandler(async (req, res) => {
         rating: 0,
         numReviews: 0,
         price: 0,
+        countInStock: 0,
         colors: [],
-        countInStock: 0
+        isFeatured: false,
+        discount: 0,
+        tags: [],
+        specifications: {}
     });
 
-    await product.save();
-    res.status(201);
-    res.json(product);
+    const createdProduct = await product.save();
+    res.status(201).json(createdProduct);
 }));
 
 // @desc       Update a product
@@ -99,20 +138,29 @@ router.put('/:id', protect, admin, asyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id);
 
     if (product) {
-        product.name = req.body.name;
-        product.image = req.body.image;
-        product.images = req.body.images;
-        product.brand = req.body.brand;
-        product.category = req.body.category;
-        product.description = req.body.description;
-        product.price = req.body.price;
-        product.colors = req.body.colors;
-        product.countInStock = req.body.colors.reduce((total, color) => 
-            total + color.sizes.reduce((sum, size) => sum + size.quantity, 0), 0);
+        product.name = req.body.name || product.name;
+        product.image = req.body.image || product.image;
+        product.images = req.body.images || product.images;
+        product.brand = req.body.brand || product.brand;
+        product.category = req.body.category || product.category;
+        product.description = req.body.description || product.description;
+        product.price = req.body.price || product.price;
+        product.countInStock = req.body.countInStock || product.countInStock;
+        product.colors = req.body.colors || product.colors;
+        product.isFeatured = req.body.isFeatured || product.isFeatured;
+        product.discount = req.body.discount || product.discount;
+        product.tags = req.body.tags || product.tags;
+        product.specifications = req.body.specifications || product.specifications;
 
-        await product.save();
-        res.status(200);
-        res.json(product);
+        // Tính toán lại tổng số lượng tồn kho
+        if (product.colors && product.colors.length > 0) {
+            product.countInStock = product.colors.reduce((total, color) => {
+                return total + color.sizes.reduce((sum, size) => sum + size.quantity, 0);
+            }, 0);
+        }
+
+        const updatedProduct = await product.save();
+        res.json(updatedProduct);
     }
     else {
         res.status(404);
@@ -172,8 +220,7 @@ router.post('/:id/reviews', protect, asyncHandler(async (req, res) => {
         product.rating = product.reviews.reduce((acc, item) => item.rating + acc, 0) / product.reviews.length;
 
         await product.save();
-        res.status(201);
-        res.json({
+        res.status(201).json({
             message: 'Đánh giá đã được thêm vào sản phẩm'
         });
     }

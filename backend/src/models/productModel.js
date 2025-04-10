@@ -71,12 +71,27 @@ const productSchema = mongoose.Schema({
         required: true,
         default: 0,
     },
-    colors: [colorSchema],
     countInStock: {
         type: Number,
         required: true,
         default: 0,
     },
+    colors: [colorSchema],
+    isFeatured: {
+        type: Boolean,
+        default: false,
+    },
+    discount: {
+        type: Number,
+        default: 0,
+    },
+    tags: [{
+        type: String
+    }],
+    specifications: {
+        type: Map,
+        of: String
+    }
 },
     {
         timestamps: true,
