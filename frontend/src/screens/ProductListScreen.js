@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Table, Button, Row, Col } from 'react-bootstrap';
+import { Table, Button, Row, Col, Image } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 // Components
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -10,10 +11,11 @@ import Message from '../components/Message';
 // Redux actions
 import { listProducts, deleteProduct, createProduct } from '../redux/actions/productActions';
 
-const ProducListScreen = (props) => {
+const ProducListScreen = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const productList = useSelector(state => state.productList);
-    const { loading, error, products } = productList;
+    const { loading, error, products = [] } = productList;
 
     const userLogin = useSelector(state => state.userLogin);
     const { userInfo } = userLogin;
@@ -31,18 +33,18 @@ const ProducListScreen = (props) => {
         dispatch({ type: 'PRODUCT_CREATE_RESET' });
 
         if (!userInfo || !userInfo.isAdmin) {
-            props.history.push('/login');
+            navigate('/login');
         }
 
         // If the product gets created redirect to edit screen to fill details
         if (createSuccess) {
-            props.history.push(`/products/${createdProduct._id}/edit`);
+            navigate(`/admin/product/${createdProduct._id}/edit`);
         }
         else {
             dispatch(listProducts());
         }
         // deleteSuccess to fetch updated list of products
-    }, [dispatch, deleteSuccess, createSuccess, props.history]);
+    }, [dispatch, deleteSuccess, createSuccess, navigate, userInfo, createdProduct]);
 
     // Displaying messages of success or error
     useEffect(() => {
@@ -93,6 +95,7 @@ const ProducListScreen = (props) => {
                     <thead>
                         <tr>
                             <th>ID</th>
+                            <th>Ảnh</th>
                             <th>Tên sản phẩm</th>
                             <th>Giá</th>
                             <th>Danh mục</th>
@@ -104,6 +107,14 @@ const ProducListScreen = (props) => {
                         {products.map((product) => (
                             <tr key={product._id}>
                                 <td>{product._id}</td>
+                                <td>
+                                    <Image 
+                                        src={product.image} 
+                                        alt={product.name} 
+                                        fluid 
+                                        style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                                    />
+                                </td>
                                 <td>{product.name}</td>
                                 <td>{product.price.toLocaleString('vi-VN')} VNĐ</td>
                                 <td>{product.category}</td>

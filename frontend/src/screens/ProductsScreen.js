@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from '../hooks/useTranslation';
 import Message from '../components/Message';
@@ -13,35 +13,45 @@ import ProductCard from '../components/ProductCard';
 // Styles
 import './ProductsScreen.scss';
 
-const ProductsScreen = ({ match, history }) => {
+const ProductsScreen = () => {
     const [searchKeyword, setSearchKeyword] = useState('');
     const [sortOption, setSortOption] = useState('');
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
 
-    const pageNumber = match.params.pageNumber || 1;
-    const keyword = match.params.keyword || '';
+    const pageNumber = searchParams.get('page') || 1;
+    const keyword = searchParams.get('keyword') || '';
 
     const dispatch = useDispatch();
     const { t } = useTranslation();
 
     const productList = useSelector((state) => state.productList);
-    const { loading, error, products, page, pages } = productList;
+    const { loading, error, products = [], page, pages } = productList;
 
     useEffect(() => {
         dispatch(listProducts(keyword, pageNumber, sortOption));
     }, [dispatch, keyword, pageNumber, sortOption]);
 
+    // Debug log
+    console.log('Products data:', products);
+    console.log('Loading:', loading);
+    console.log('Error:', error);
+
     const submitHandler = (e) => {
         e.preventDefault();
         if (searchKeyword.trim()) {
-            history.push(`/search/${searchKeyword}`);
+            navigate(`/search?keyword=${searchKeyword}`);
         } else {
-            history.push('/');
+            navigate('/');
         }
     };
 
     const sortHandler = (e) => {
         setSortOption(e.target.value);
     };
+
+    // Ensure products is always an array
+    const productItems = Array.isArray(products) ? products : [];
 
     return (
         <div className="products-container">
@@ -60,9 +70,7 @@ const ProductsScreen = ({ match, history }) => {
                             value={searchKeyword}
                             onChange={(e) => setSearchKeyword(e.target.value)}
                         />
-                        <button type="submit">
-                            <i className="fas fa-search"></i>
-                        </button>
+                        <button type="submit">{t('searchButton')}</button>
                     </form>
 
                     <div className="products-header-filters-sort">
@@ -84,24 +92,22 @@ const ProductsScreen = ({ match, history }) => {
             ) : (
                 <>
                     <div className="products-grid">
-                        {products.map((product) => (
-                            <ProductCard key={product._id} product={product} />
-                        ))}
+                        {productItems.length > 0 ? (
+                            productItems.map((product) => (
+                                <ProductCard key={product._id} product={product} />
+                            ))
+                        ) : (
+                            <div className="products-empty">
+                                <div className="products-empty-icon">
+                                    <i className="fas fa-search"></i>
+                                </div>
+                                <div className="products-empty-message">
+                                    {t('noProductsFound')}
+                                </div>
+                                <Link to="/" className="products-empty-button">{t('goBackHome')}</Link>
+                            </div>
+                        )}
                     </div>
-
-                    {products.length === 0 && (
-                        <div className="products-empty">
-                            <div className="products-empty-icon">
-                                <i className="fas fa-search"></i>
-                            </div>
-                            <div className="products-empty-message">
-                                {t('noProductsFound')}
-                            </div>
-                            <Link to="/" className="products-empty-button">
-                                {t('goBack')}
-                            </Link>
-                        </div>
-                    )}
 
                     <Paginate
                         pages={pages}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
-import { Form, InputGroup, Button } from 'react-bootstrap';
+import { Form, FormControl, Button, InputGroup } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../hooks/useTranslation';
 
 // Styles
@@ -8,33 +8,29 @@ import './SearchBox.scss';
 
 const SearchBox = () => {
     const [keyword, setKeyword] = useState('');
-    const history = useHistory();
+    const navigate = useNavigate();
     const { t } = useTranslation();
 
     const submitHandler = (e) => {
         e.preventDefault();
         if (keyword.trim()) {
-            history.push(`/search/${keyword}`);
+            navigate(`/search?keyword=${keyword}`);
         } else {
-            history.push('/');
+            navigate('/');
         }
     };
 
     return (
-        <Form onSubmit={submitHandler} className="search-box">
+        <Form onSubmit={submitHandler} className='d-flex'>
             <InputGroup>
-                <Form.Control
-                    type="text"
-                    name="q"
+                <FormControl
+                    type='text'
+                    name='q'
                     onChange={(e) => setKeyword(e.target.value)}
                     placeholder={t('searchProducts')}
-                    className="search-box-input"
+                    className='mr-sm-2 ml-sm-5'
                 />
-                <Button
-                    type="submit"
-                    variant="outline-secondary"
-                    className="search-box-button"
-                >
+                <Button type='submit' variant='outline-success' className='p-2'>
                     <i className="fas fa-search"></i>
                 </Button>
             </InputGroup>

@@ -1,6 +1,7 @@
 export const translations = {
     en: {
         // Header
+        shopName: 'Pro Shop',
         cart: 'Cart',
         login: 'Login',
         profile: 'Profile',
@@ -10,6 +11,14 @@ export const translations = {
         orders: 'Orders',
         search: 'Search Products...',
         searchButton: 'Search',
+        allProducts: 'All Products',
+        passwordRequirements: 'Password Requirements',
+        goBackHome: 'Go Back Home',
+        submit: 'Submit',
+        addToCart: 'Add to Cart',
+        removeFromCart: 'Remove from Cart',
+        increaseQuantity: 'Increase Quantity',
+        decreaseQuantity: 'Decrease Quantity',
 
         // Home
         featuredProducts: 'Featured Products',
@@ -34,6 +43,9 @@ export const translations = {
         submit: 'Submit',
         pleaseLogin: 'Please sign in to write a review',
         noReviews: 'No Reviews',
+        color: 'Color',
+        size: 'Size',
+        quantity: 'Quantity',
 
         // Cart
         shoppingCart: 'Shopping Cart',
@@ -42,6 +54,7 @@ export const translations = {
         price: 'Price',
         quantity: 'Quantity',
         proceedToCheckout: 'Proceed To Checkout',
+        cartSummary: 'Order Summary',
 
         // Auth
         name: 'Name',
@@ -135,6 +148,7 @@ export const translations = {
     },
     vi: {
         // Header
+        shopName: 'Pro Shop',
         cart: 'Giỏ hàng',
         login: 'Đăng nhập',
         profile: 'Hồ sơ',
@@ -144,6 +158,14 @@ export const translations = {
         orders: 'Đơn hàng',
         search: 'Tìm kiếm sản phẩm...',
         searchButton: 'Tìm kiếm',
+        allProducts: 'Tất cả sản phẩm',
+        passwordRequirements: 'Yêu cầu mật khẩu',
+        goBackHome: 'Quay về trang chủ',
+        submit: 'Gửi',
+        addToCart: 'Thêm vào giỏ hàng',
+        removeFromCart: 'Xóa khỏi giỏ hàng',
+        increaseQuantity: 'Tăng số lượng',
+        decreaseQuantity: 'Giảm số lượng',
 
         // Home
         featuredProducts: 'Sản phẩm nổi bật',
@@ -168,6 +190,9 @@ export const translations = {
         submit: 'Gửi',
         pleaseLogin: 'Vui lòng đăng nhập để viết đánh giá',
         noReviews: 'Chưa có đánh giá',
+        color: 'Màu sắc',
+        size: 'Kích thước',
+        quantity: 'Số lượng',
 
         // Cart
         shoppingCart: 'Giỏ hàng',
@@ -176,6 +201,7 @@ export const translations = {
         price: 'Giá',
         quantity: 'Số lượng',
         proceedToCheckout: 'Tiến hành thanh toán',
+        cartSummary: 'Tổng quan đơn hàng',
 
         // Auth
         name: 'Họ tên',
@@ -269,6 +295,7 @@ export const translations = {
     },
     zh: {
         // Header
+        shopName: 'Pro Shop',
         cart: '购物车',
         login: '登录',
         profile: '个人资料',

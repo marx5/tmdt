@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Row, Col, ListGroup, Image, Card, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import { PayPalButton } from 'react-paypal-button-v2';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { PayPalButtons, PayPalScriptProvider } from '@paypal/react-paypal-js';
 
 // Components
 import Message from '../components/Message';
@@ -13,9 +12,11 @@ import Meta from '../components/Meta';
 // Redux actions
 import { getOrderDetails, payOrder, deliverOrder } from '../redux/actions/orderActions';
 import { useTranslation } from '../hooks/useTranslation';
+import { ORDER_PAY_RESET } from '../redux/constants/orderConstants';
 
-const OrderScreen = (props) => {
-    const orderID = props.match.params.id;
+const OrderScreen = () => {
+    const { id: orderId } = useParams();
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const { t } = useTranslation();
 
@@ -40,38 +41,30 @@ const OrderScreen = (props) => {
     }
 
     useEffect(() => {
+        if (!userInfo) {
+            navigate('/login');
+        }
+
         const addPayPalScript = async () => {
-            const res = await axios.get('/api/config/paypal');
-            const script = document.createElement('script');
-            script.src = `https://www.paypal.com/sdk/js?client-id=${res.data}`;
-            script.async = true;
-            script.onload = () => { setSdkReady(true) };
-            document.body.appendChild(script);
-        }
-        // If order isn't loaded OR we make payment OR admin marks as delivered, we load order
-        if (!order || paySuccess || deliverSuccess || (order && order._id !== orderID)) {
-            // Without reset it will keep refreshing after payment due to paySuccess
-            dispatch({ type: 'ORDER_PAY_RESET' });
+            setSdkReady(true);
+        };
+
+        if (!order || paySuccess || deliverSuccess || order._id !== orderId) {
+            dispatch({ type: ORDER_PAY_RESET });
             dispatch({ type: 'ORDER_DELIVER_RESET' });
-            dispatch(getOrderDetails(orderID));
-        }
-        // If order is NOT paid
-        else if (!order.isPaid) {
-            // If PayPal isn't loaded, add the script
+            dispatch(getOrderDetails(orderId));
+        } else if (!order.isPaid) {
             if (!window.paypal) {
                 addPayPalScript();
-            }
-            // Else if PayPal is ready, set it as ready
-            else {
+            } else {
                 setSdkReady(true);
             }
         }
-    }, [dispatch, orderID, order, paySuccess, deliverSuccess]);
+    }, [dispatch, orderId, order, paySuccess, deliverSuccess, userInfo, navigate]);
 
     // Handles success from PayPal button
     const successPaymentHandler = (paymentResult) => {
-        console.log(paymentResult);
-        dispatch(payOrder(orderID, paymentResult));
+        dispatch(payOrder(orderId, paymentResult));
     }
 
     const handleMarkAsDelivered = (e) => {
@@ -96,7 +89,7 @@ const OrderScreen = (props) => {
                         <p>
                             <strong>{t('address')}: </strong>
                             {order.shippingAddress.address}, {order.shippingAddress.city}{' '}
-                            {order.shippingAddress.postalCode}
+                            {order.shippingAddress.postalCode}, {order.shippingAddress.country}
                         </p>
                         {order.isDelivered ? (
                             <Message variant='success' message={`${t('delivered')} ${order.deliveredAt}`} />
@@ -109,7 +102,22 @@ const OrderScreen = (props) => {
                         <h2>{t('paymentMethod')}</h2>
                         <p>
                             <strong>{t('method')}: </strong>
-                            {order.paymentMethod}
+                            {order.paymentMethod === 'PayPal' ? (
+                                <span>
+                                    <i className="fab fa-paypal" style={{ color: '#0070ba', marginRight: '5px' }}></i>
+                                    {order.paymentMethod}
+                                </span>
+                            ) : order.paymentMethod === 'COD' ? (
+                                <span>
+                                    <i className="fas fa-money-bill-wave" style={{ color: '#28a745', marginRight: '5px' }}></i>
+                                    Thanh toán khi nhận hàng
+                                </span>
+                            ) : (
+                                <span>
+                                    <i className="fas fa-credit-card" style={{ color: '#6c757d', marginRight: '5px' }}></i>
+                                    {order.paymentMethod}
+                                </span>
+                            )}
                         </p>
                         {order.isPaid ? (
                             <Message variant='success' message={`${t('paidOn')} ${order.paidAt}`} />
@@ -125,7 +133,7 @@ const OrderScreen = (props) => {
                                 {order.orderItems.map((item, index) => {
                                     return <ListGroup.Item key={index}>
                                         <Row>
-                                            <Col md={2}>
+                                            <Col md={1}>
                                                 <Image src={item.image} alt={item.name} fluid rounded />
                                             </Col>
                                             <Col>
@@ -134,8 +142,8 @@ const OrderScreen = (props) => {
                                                 </Link>
                                             </Col>
                                             <Col md={4}>
-                                                {item.price.toLocaleString('vi-VN')} VNĐ x {item.qty} = {(item.price * item.qty).toLocaleString('vi-VN')} VNĐ
-                                            </Col>
+                                                        {item.qty} x {item.price.toLocaleString('vi-VN')} VNĐ = {(item.qty * item.price).toLocaleString('vi-VN')} VNĐ
+                                                    </Col>
                                         </Row>
                                     </ListGroup.Item>
                                 })}
@@ -174,17 +182,55 @@ const OrderScreen = (props) => {
                                 <Col>{order.totalPrice.toLocaleString('vi-VN')} VNĐ</Col>
                             </Row>
                         </ListGroup.Item>
-                        {!order.isPaid && <ListGroup.Item>
-                            {payLoading && <LoadingSpinner />}
-                            {!sdkReady ? (
-                                <LoadingSpinner />
-                            ) : (
-                                <PayPalButton
-                                    amount={order.totalPrice}
-                                    onSuccess={successPaymentHandler}
-                                />
-                            )}
-                        </ListGroup.Item>}
+                        {!order.isPaid && (
+                            <ListGroup.Item>
+                                {payLoading && <LoadingSpinner />}
+                                {order.paymentMethod === 'PayPal' ? (
+                                    !sdkReady ? (
+                                        <LoadingSpinner />
+                                    ) : (
+                                        <PayPalScriptProvider options={{ "client-id": "YOUR_CLIENT_ID" }}>
+                                            <PayPalButtons
+                                                createOrder={(data, actions) => {
+                                                    return actions.order.create({
+                                                        purchase_units: [
+                                                            {
+                                                                amount: {
+                                                                    value: order.totalPrice,
+                                                                },
+                                                            },
+                                                        ],
+                                                    });
+                                                }}
+                                                onApprove={(data, actions) => {
+                                                    return actions.order.capture().then((details) => {
+                                                        successPaymentHandler(details);
+                                                    });
+                                                }}
+                                            />
+                                        </PayPalScriptProvider>
+                                    )
+                                ) : order.paymentMethod === 'COD' ? (
+                                    <Button
+                                        variant="primary"
+                                        className="btn-block"
+                                        onClick={() => successPaymentHandler({ id: 'COD' })}
+                                    >
+                                        <i className="fas fa-money-bill-wave" style={{ marginRight: '5px' }}></i>
+                                        Xác nhận đơn hàng
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        variant="primary"
+                                        className="btn-block"
+                                        onClick={() => successPaymentHandler({ id: 'OTHER' })}
+                                    >
+                                        <i className="fas fa-credit-card" style={{ marginRight: '5px' }}></i>
+                                        Thanh toán
+                                    </Button>
+                                )}
+                            </ListGroup.Item>
+                        )}
                         {userInfo && userInfo.isAdmin && order.isPaid && !order.isDelivered && (
                             <ListGroup.Item>
                                 <Button type='button' className='btn btn-block' onClick={handleMarkAsDelivered}>

@@ -1,26 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import FormContainer from '../components/UI/FormContainer';
 import CheckoutSteps from '../components/CheckoutSteps';
 import { saveShippingAddress } from '../redux/actions/cartActions';
 import { useTranslation } from '../hooks/useTranslation';
+import Message from '../components/Message';
 
-const ShippingScreen = (props) => {
+const ShippingScreen = () => {
     const cart = useSelector(state => state.cart);
-    const { shippingAddress } = cart;
+    const { shippingAddress, cartItems } = cart;
     const { t } = useTranslation();
-
-    const [address, setAddress] = useState(shippingAddress.address || '');
-    const [city, setCity] = useState(shippingAddress.city || '');
-    const [postalCode, setPostalCode] = useState(shippingAddress.postalCode || '');
-
+    const navigate = useNavigate();
     const dispatch = useDispatch();
+
+    const userLogin = useSelector(state => state.userLogin);
+    const { userInfo } = userLogin;
+
+    const [address, setAddress] = useState(shippingAddress?.address || '');
+    const [city, setCity] = useState(shippingAddress?.city || '');
+    const [postalCode, setPostalCode] = useState(shippingAddress?.postalCode || '');
+
+    useEffect(() => {
+        if (!userInfo) {
+            navigate('/login?redirect=shipping');
+        }
+        if (cartItems.length === 0) {
+            navigate('/cart');
+        }
+    }, [userInfo, cartItems, navigate]);
 
     const submitHandler = (e) => {
         e.preventDefault();
+        if (!address || !city || !postalCode) {
+            return;
+        }
         dispatch(saveShippingAddress({ address, city, postalCode }));
-        props.history.push('/payment');
+        navigate('/payment');
     }
 
     return (

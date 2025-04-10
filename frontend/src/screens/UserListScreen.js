@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Table, Button } from 'react-bootstrap';
+import { Table, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 // Components
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -11,10 +12,11 @@ import Meta from '../components/Meta';
 // Redux actions
 import { getUsers, deleteUser } from '../redux/actions/userActions';
 
-const UserListScreen = (props) => {
+const UserListScreen = () => {
     const dispatch = useDispatch();
     const usersList = useSelector(state => state.usersList);
     const { loading, error, users } = usersList;
+    const navigate = useNavigate();
 
     const userLogin = useSelector(state => state.userLogin);
     const { userInfo } = userLogin;
@@ -24,15 +26,49 @@ const UserListScreen = (props) => {
             dispatch(getUsers());
         }
         else {
-            props.history.push('/login');
+            navigate('/login');
         }
-    }, [dispatch]);
+    }, [dispatch, navigate, userInfo]);
 
-    const userDeleteHandler = async (id) => {
-        if (window.confirm('Are you sure want to delete this user?')) {
+    const userDeleteHandler = async (id, isAdmin) => {
+        if (isAdmin) {
+            alert('Không thể xóa tài khoản admin khác');
+            return;
+        }
+        if (window.confirm('Bạn có chắc chắn muốn xóa người dùng này?')) {
             await dispatch(deleteUser(id));
             dispatch(getUsers());
         }
+    }
+
+    const renderDeleteButton = (user) => {
+        if (user.isAdmin) {
+            return (
+                <OverlayTrigger
+                    placement="top"
+                    overlay={<Tooltip>Không thể xóa tài khoản admin</Tooltip>}
+                >
+                    <span>
+                        <Button
+                            variant='danger'
+                            className='btn-sm'
+                            disabled
+                        >
+                            <i className='fas fa-trash' />
+                        </Button>
+                    </span>
+                </OverlayTrigger>
+            );
+        }
+        return (
+            <Button
+                variant='danger'
+                className='btn-sm'
+                onClick={() => userDeleteHandler(user._id, user.isAdmin)}
+            >
+                <i className='fas fa-trash' />
+            </Button>
+        );
     }
 
     return <>
@@ -65,14 +101,7 @@ const UserListScreen = (props) => {
                                 <LinkContainer to={`/admin/user/${user._id}/edit`}>
                                     <Button variant='light' className='btn-sm'><i className='fas fa-edit' /></Button>
                                 </LinkContainer>
-                                <Button
-                                    variant='danger'
-                                    className='btn-sm'
-                                    onClick={userDeleteHandler.bind(null, user._id)}
-                                    disabled={user.isAdmin}
-                                >
-                                    <i className='fas fa-trash' />
-                                </Button>
+                                {renderDeleteButton(user)}
                             </td>
                         </tr>
                     })}

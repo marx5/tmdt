@@ -1,0 +1,4 @@
+.flying-product {
+    transition: transform 0.1s ease-out;
+    will-change: transform, opacity;
+} 

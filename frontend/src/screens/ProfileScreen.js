@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Row, Col, Form, Button, Table } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 // Components
 import Message from '../components/Message';
@@ -12,7 +13,7 @@ import Meta from '../components/Meta';
 import { getUserDetails, updateUserProfile } from '../redux/actions/userActions';
 import { myOrders } from '../redux/actions/orderActions';
 
-const ProfileScreen = (props) => {
+const ProfileScreen = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -24,6 +25,7 @@ const ProfileScreen = (props) => {
     const { loading, error, user } = userDetails;
     const userLogin = useSelector(state => state.userLogin);
     const { userInfo } = userLogin;
+    const navigate = useNavigate();
 
     const userUpdateProfile = useSelector(state => state.userUpdateProfile);
     const { success } = userUpdateProfile;
@@ -34,7 +36,7 @@ const ProfileScreen = (props) => {
     useEffect(() => {
         // If user is not logged in
         if (!userInfo) {
-            props.history.push('/login');
+            navigate('/login');
         }
         else {
             if (!user) {
@@ -46,7 +48,7 @@ const ProfileScreen = (props) => {
                 setEmail(user.email);
             }
         }
-    }, [dispatch, userInfo, props.history, user]);
+    }, [dispatch, userInfo, navigate, user]);
 
     const submitHandler = (e) => {
         e.preventDefault();

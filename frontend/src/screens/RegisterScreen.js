@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import Message from '../components/Message';
@@ -11,7 +11,7 @@ import { useTranslation } from '../hooks/useTranslation';
 // Styles
 import './RegisterScreen.scss';
 
-const RegisterScreen = (props) => {
+const RegisterScreen = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -32,14 +32,16 @@ const RegisterScreen = (props) => {
     const userRegister = useSelector(state => state.userRegister);
     const { loading, error, userInfo } = userRegister;
     const { t } = useTranslation();
+    const navigate = useNavigate();
+    const location = useLocation();
 
-    const redirect = props.location.search ? props.location.search.split('=')[1] : '/';
+    const redirect = location.search ? location.search.split('=')[1] : '/';
 
     useEffect(() => {
         if (userInfo) {
-            props.history.push(redirect);
+            navigate(redirect);
         }
-    }, [props.history, userInfo, redirect]);
+    }, [userInfo, redirect, navigate]);
 
     // Validate password requirements
     useEffect(() => {
