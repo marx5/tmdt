@@ -1,34 +1,45 @@
 import React, { useState } from 'react';
-import { Form, Button } from 'react-bootstrap';
+import { useHistory } from 'react-router-dom';
+import { Form, InputGroup, Button } from 'react-bootstrap';
 import { useTranslation } from '../hooks/useTranslation';
 
-const SearchBox = ({ history }) => {
+// Styles
+import './SearchBox.scss';
+
+const SearchBox = () => {
     const [keyword, setKeyword] = useState('');
+    const history = useHistory();
     const { t } = useTranslation();
 
     const submitHandler = (e) => {
         e.preventDefault();
         if (keyword.trim()) {
-            history.push(`/search?keyword=${keyword}`);
+            history.push(`/search/${keyword}`);
         } else {
             history.push('/');
         }
-    }
+    };
 
     return (
-        <Form onSubmit={submitHandler} inline>
-            <Form.Control
-                type='text'
-                name='q'
-                onChange={(e) => setKeyword(e.target.value)}
-                placeholder={t('search')}
-                className='mr-sm-2 ml-sm-5'
-            ></Form.Control>
-            <Button type='submit' variant='outline-success' className='p-2'>
-                {t('searchButton')}
-            </Button>
+        <Form onSubmit={submitHandler} className="search-box">
+            <InputGroup>
+                <Form.Control
+                    type="text"
+                    name="q"
+                    onChange={(e) => setKeyword(e.target.value)}
+                    placeholder={t('searchProducts')}
+                    className="search-box-input"
+                />
+                <Button
+                    type="submit"
+                    variant="outline-secondary"
+                    className="search-box-button"
+                >
+                    <i className="fas fa-search"></i>
+                </Button>
+            </InputGroup>
         </Form>
-    )
-}
+    );
+};
 
 export default SearchBox;

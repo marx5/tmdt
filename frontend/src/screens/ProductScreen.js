@@ -16,11 +16,16 @@ import { singleProduct, createReview } from '../redux/actions/productActions';
 // Redux constants
 import * as productConstants from '../redux/constants/productConstants';
 
+// Styles
+import './ProductScreen.scss';
+
 const ProductScreen = (props) => {
     const [qty, setQty] = useState(1);
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
     const [reviewSubmitted, setReviewSubmitted] = useState(false);
+    const [selectedColor, setSelectedColor] = useState('');
+    const [selectedSize, setSelectedSize] = useState('');
 
     const dispatch = useDispatch();
     const { t } = useTranslation();
@@ -61,7 +66,11 @@ const ProductScreen = (props) => {
     }, [dispatch, props.match.params.id, createReviewSuccess]);
 
     const addToCartHandler = () => {
-        props.history.push(`/cart/${props.match.params.id}?qty=${qty}`);
+        if (!selectedColor || !selectedSize) {
+            alert('Vui lòng chọn màu sắc và kích thước');
+            return;
+        }
+        props.history.push(`/cart/${props.match.params.id}?qty=${qty}&color=${selectedColor}&size=${selectedSize}`);
     }
 
     const submitHandler = (e) => {
@@ -74,64 +83,111 @@ const ProductScreen = (props) => {
         );
     }
 
-    return <>
-        <Link className='btn btn-light my-3' to='/'>
-            {t('goBack')}
-        </Link>
-        {loading && <LoadingSpinner />}
-        {error ? <Message message={error} /> : (
-            <>
-                <Meta title={product.name || ''} />
-                <Row>
-                    <Col md={6}>
-                        <Image src={product.image} alt={product.name} fluid />
-                    </Col>
-                    <Col md={3}>
-                        <ListGroup variant='flush'>
-                            <ListGroup.Item>
-                                <h3>{product.name}</h3>
-                            </ListGroup.Item>
-                            <ListGroup.Item>
+    return (
+        <div className="product-container">
+            <Link className="product-back btn btn-light" to='/'>
+                {t('goBack')}
+            </Link>
+            
+            {loading && <LoadingSpinner />}
+            {error ? <Message message={error} /> : (
+                <>
+                    <Meta title={product.name || ''} />
+                    
+                    <div className="product-content">
+                        <div className="product-gallery">
+                            <div className="product-gallery-main">
+                                <Image src={product.image} alt={product.name} fluid />
+                            </div>
+                            {product.images && product.images.length > 0 && (
+                                <div className="product-gallery-thumbnails">
+                                    {product.images.map((image, index) => (
+                                        <img 
+                                            key={index} 
+                                            src={image} 
+                                            alt={`${product.name} ${index + 1}`}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="product-info">
+                            <h1 className="product-info-title">{product.name}</h1>
+                            <div className="product-info-rating">
                                 <Rating
                                     value={product.rating || 0}
                                     text={`${product.numReviews || 0} ${t('reviews')}`}
                                 />
-                            </ListGroup.Item>
-                            <ListGroup.Item>
-                                {t('price')}: {product.price ? product.price.toLocaleString('vi-VN') : 0} VNĐ
-                            </ListGroup.Item>
-                            <ListGroup.Item>
-                                {t('description')}: {product.description}
-                            </ListGroup.Item>
-                        </ListGroup>
-                    </Col>
-                    <Col md={3}>
-                        <Card>
-                            <ListGroup variant='flush'>
-                                <ListGroup.Item>
-                                    <Row>
-                                        <Col>{t('price')}:</Col>
-                                        <Col>
+                            </div>
+                            <div className="product-info-price">
+                                {product.price ? product.price.toLocaleString('vi-VN') : 0} VNĐ
+                            </div>
+                            <div className="product-info-description">
+                                {product.description}
+                            </div>
+
+                            <Card className="product-details">
+                                <ListGroup variant='flush'>
+                                    <ListGroup.Item className="product-details-item">
+                                        <span>{t('price')}:</span>
+                                        <span>
                                             <strong>{product.price ? product.price.toLocaleString('vi-VN') : 0} VNĐ</strong>
-                                        </Col>
-                                    </Row>
-                                </ListGroup.Item>
+                                        </span>
+                                    </ListGroup.Item>
 
-                                <ListGroup.Item>
-                                    <Row>
-                                        <Col>{t('status')}:</Col>
-                                        <Col>
+                                    <ListGroup.Item className="product-details-item">
+                                        <span>{t('status')}:</span>
+                                        <span>
                                             {product.countInStock > 0 ? t('inStock') : t('outOfStock')}
-                                        </Col>
-                                    </Row>
-                                </ListGroup.Item>
+                                        </span>
+                                    </ListGroup.Item>
 
-                                {product.countInStock > 0 && (
-                                    <ListGroup.Item>
-                                        <Row>
-                                            <Col>{t('quantity')}</Col>
-                                            <Col>
-                                                <div className="quantity-selector d-flex align-items-center">
+                                    {product.colors && product.colors.length > 0 && (
+                                        <ListGroup.Item>
+                                            <div className="product-colors">
+                                                <div className="product-colors-title">{t('color')}:</div>
+                                                <div className="product-colors-list">
+                                                    {product.colors.map((color) => (
+                                                        <div
+                                                            key={color.name}
+                                                            className={`product-colors-item ${selectedColor === color.name ? 'selected' : ''}`}
+                                                            style={{ backgroundColor: color.code }}
+                                                            onClick={() => setSelectedColor(color.name)}
+                                                            title={color.name}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </ListGroup.Item>
+                                    )}
+
+                                    {selectedColor && product.colors && (
+                                        <ListGroup.Item>
+                                            <div className="product-sizes">
+                                                <div className="product-sizes-title">{t('size')}:</div>
+                                                <div className="product-sizes-list">
+                                                    {product.colors
+                                                        .find(c => c.name === selectedColor)
+                                                        .sizes.map((size) => (
+                                                            <div
+                                                                key={size.size}
+                                                                className={`product-sizes-item ${selectedSize === size.size ? 'selected' : ''} ${size.quantity === 0 ? 'disabled' : ''}`}
+                                                                onClick={() => size.quantity > 0 && setSelectedSize(size.size)}
+                                                            >
+                                                                {size.size} ({size.quantity})
+                                                            </div>
+                                                        ))}
+                                                </div>
+                                            </div>
+                                        </ListGroup.Item>
+                                    )}
+
+                                    {product.countInStock > 0 && (
+                                        <ListGroup.Item>
+                                            <div className="product-quantity">
+                                                <div className="product-quantity-title">{t('quantity')}</div>
+                                                <div className="product-quantity-selector">
                                                     <Button
                                                         variant="outline-secondary"
                                                         size="sm"
@@ -142,7 +198,6 @@ const ProductScreen = (props) => {
                                                     </Button>
 
                                                     <Form.Control
-                                                        className="mx-2 text-center"
                                                         value={qty}
                                                         onChange={(e) => {
                                                             const value = Number(e.target.value);
@@ -150,7 +205,6 @@ const ProductScreen = (props) => {
                                                                 setQty(value);
                                                             }
                                                         }}
-                                                        style={{ width: '60px' }}
                                                     />
 
                                                     <Button
@@ -162,115 +216,106 @@ const ProductScreen = (props) => {
                                                         <i className="fas fa-plus"></i>
                                                     </Button>
                                                 </div>
-                                            </Col>
-                                        </Row>
-                                    </ListGroup.Item>
-                                )}
+                                            </div>
+                                        </ListGroup.Item>
+                                    )}
 
-                                <ListGroup.Item>
-                                    <Button
-                                        className='btn-block'
-                                        type='button'
-                                        disabled={product.countInStock === 0}
-                                        onClick={addToCartHandler}
-                                    >
-                                        {t('addToCart')}
-                                    </Button>
-                                </ListGroup.Item>
-                            </ListGroup>
-                        </Card>
-                    </Col>
-                </Row>
-                {/* Reviews */}
-                <Row className='my-3'>
-                    <Col md={6}>
-                        <h2>{t('reviews')}</h2>
-                        {/* If no review exists */}
-                        {(!product.reviews || product.reviews.length === 0) && <Message variant='info' message={t('noReviews')} />}
-                        {/* If there are reviews */}
-                        <ListGroup variant='flush'>
-                            {product.reviews && product.reviews.map((review) => (
-                                <ListGroup.Item key={review._id}>
-                                    <strong>{review.name}</strong>
-                                    <Rating value={review.rating} />
-                                    <p>{review.createdAt && review.createdAt.substring(0, 10)}</p>
-                                    <p>{review.comment}</p>
-                                </ListGroup.Item>
-                            ))}
-                            <ListGroup.Item>
-                                <h2 className='mt-3'>{t('writeReview')}</h2>
-                                {reviewSubmitted && (
-                                    <div className="alert alert-success alert-dismissible fade show" role="alert">
-                                        <i className="fas fa-check-circle mr-2"></i>
-                                        <strong>{t('reviewSubmitted')}</strong>
-                                        <p className="mb-0 mt-1">{t('thankYouForReview')}</p>
-                                        <button
-                                            type="button"
-                                            className="close"
-                                            onClick={() => setReviewSubmitted(false)}
-                                        >
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                )}
-                                {createReviewError && (
-                                    <Message
-                                        variant='danger'
-                                        message={createReviewError}
-                                    />
-                                )}
-                                {userInfo ? (
-                                    <Form onSubmit={submitHandler} className="mt-3">
-                                        <Form.Group controlId='rating'>
-                                            <Form.Label>{t('rating')}</Form.Label>
-                                            <Form.Control
-                                                as='select'
-                                                value={rating}
-                                                onChange={(e) => setRating(e.target.value)}
-                                                className="form-control-lg"
-                                            >
-                                                <option value=''>{t('selectRating')}</option>
-                                                <option value='1'>1 - {t('poor')}</option>
-                                                <option value='2'>2 - {t('fair')}</option>
-                                                <option value='3'>3 - {t('good')}</option>
-                                                <option value='4'>4 - {t('veryGood')}</option>
-                                                <option value='5'>5 - {t('excellent')}</option>
-                                            </Form.Control>
-                                        </Form.Group>
-                                        <Form.Group controlId='comment'>
-                                            <Form.Label>{t('comment')}</Form.Label>
-                                            <Form.Control
-                                                as='textarea'
-                                                rows='4'
-                                                value={comment}
-                                                onChange={(e) => setComment(e.target.value)}
-                                                className="form-control-lg"
-                                                placeholder={t('writeYourComment')}
-                                            ></Form.Control>
-                                        </Form.Group>
+                                    <ListGroup.Item>
                                         <Button
-                                            type='submit'
-                                            variant='primary'
-                                            className='mt-3 btn-lg'
+                                            className='btn-block'
+                                            type='button'
+                                            disabled={product.countInStock === 0 || !selectedColor || !selectedSize}
+                                            onClick={addToCartHandler}
                                         >
-                                            {t('submit')}
+                                            {t('addToCart')}
                                         </Button>
-                                    </Form>
-                                ) : (
-                                    <div className="alert alert-info mt-3" role="alert">
-                                        <i className="fas fa-info-circle mr-2"></i>
-                                        <Link to='/login' className="alert-link">
-                                            {t('pleaseLogin')}
-                                        </Link>
+                                    </ListGroup.Item>
+                                </ListGroup>
+                            </Card>
+                        </div>
+                    </div>
+
+                    <div className="product-reviews">
+                        <h2 className="product-reviews-title">{t('reviews')}</h2>
+                        
+                        {(!product.reviews || product.reviews.length === 0) && (
+                            <Message variant='info' message={t('noReviews')} />
+                        )}
+
+                        <div className="product-reviews-list">
+                            {product.reviews && product.reviews.map((review) => (
+                                <div key={review._id} className="product-reviews-item">
+                                    <div className="product-reviews-item-header">
+                                        <div className="product-reviews-item-name">{review.name}</div>
+                                        <div className="product-reviews-item-date">
+                                            {review.createdAt && review.createdAt.substring(0, 10)}
+                                        </div>
                                     </div>
-                                )}
-                            </ListGroup.Item>
-                        </ListGroup>
-                    </Col>
-                </Row>
-            </>
-        )}
-    </>
-}
+                                    <Rating value={review.rating} />
+                                    <div className="product-reviews-item-comment">{review.comment}</div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="product-reviews-form">
+                            <h2 className="product-reviews-form-title">{t('writeReview')}</h2>
+                            
+                            {reviewSubmitted && (
+                                <Message variant='success' message={t('reviewSubmitted')} />
+                            )}
+                            
+                            {createReviewError && (
+                                <Message variant='danger' message={createReviewError} />
+                            )}
+                            
+                            {userInfo ? (
+                                <Form onSubmit={submitHandler}>
+                                    <Form.Group controlId='rating' className="product-reviews-form-rating">
+                                        <Form.Label>{t('rating')}</Form.Label>
+                                        <Form.Control
+                                            as='select'
+                                            value={rating}
+                                            onChange={(e) => setRating(e.target.value)}
+                                        >
+                                            <option value=''>{t('selectRating')}</option>
+                                            <option value='1'>1 - {t('poor')}</option>
+                                            <option value='2'>2 - {t('fair')}</option>
+                                            <option value='3'>3 - {t('good')}</option>
+                                            <option value='4'>4 - {t('veryGood')}</option>
+                                            <option value='5'>5 - {t('excellent')}</option>
+                                        </Form.Control>
+                                    </Form.Group>
+                                    <Form.Group controlId='comment' className="product-reviews-form-comment">
+                                        <Form.Label>{t('comment')}</Form.Label>
+                                        <Form.Control
+                                            as='textarea'
+                                            rows='4'
+                                            value={comment}
+                                            onChange={(e) => setComment(e.target.value)}
+                                            placeholder={t('writeYourComment')}
+                                        />
+                                    </Form.Group>
+                                    <Button
+                                        type='submit'
+                                        variant='primary'
+                                        className="product-reviews-form-submit"
+                                    >
+                                        {t('submit')}
+                                    </Button>
+                                </Form>
+                            ) : (
+                                <Message variant='info' message={
+                                    <>
+                                        {t('pleaseLogin')} <Link to='/login'>{t('login')}</Link>
+                                    </>
+                                } />
+                            )}
+                        </div>
+                    </div>
+                </>
+            )}
+        </div>
+    );
+};
 
 export default ProductScreen;

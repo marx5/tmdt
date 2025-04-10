@@ -46,7 +46,7 @@ if(process.env.NODE_ENV === 'PRODUCTION') {
 }
 
 // Making uploads folder static
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use(notFound);
 app.use(errorHandler);
