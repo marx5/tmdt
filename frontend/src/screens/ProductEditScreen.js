@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import axios from 'axios';
 import { Link, useParams } from 'react-router-dom';
 import FormContainer from '../components/UI/FormContainer';
+import axiosConfig from '../redux/actions/axiosConfig';
 
 // Components
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -99,7 +99,7 @@ const ProductEditScreen = () => {
                 },
             };
 
-            const { data } = await axios.post('/api/upload', formData, config);
+            const { data } = await axiosConfig.jsConfig.js.post('/api/upload', formData, config);
 
             setImage(data);
             setUploading(false);

@@ -1,6 +1,7 @@
 import express from'express';
 import dotenv from 'dotenv';
 import path from 'path';
+import cors from 'cors';
 
 // DB
 import connectDB from './config/db.js'
@@ -18,6 +19,14 @@ dotenv.config();
 connectDB();
 
 const app = express();
+
+// CORS configuration
+app.use(cors({
+    origin: 'http://localhost:3000', // Frontend URL
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // JSON body parser for incoming requests
 app.use(express.json());
@@ -51,5 +60,5 @@ app.use('/images', express.static(path.join(__dirname, '/images')));
 app.use(notFound);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 app.listen(PORT, console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`));

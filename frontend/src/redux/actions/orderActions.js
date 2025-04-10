@@ -1,5 +1,5 @@
 import * as orderConstants from '../constants/orderConstants';
-import axios from 'axios';
+import axios from './axiosConfig.js';
 
 export const createOrder = (order) => {
     return async (dispatch, getState) => {
