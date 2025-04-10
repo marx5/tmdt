@@ -4,19 +4,11 @@ export const cartReducer = (state = { cartItems: [], shippingAddress: {} }, acti
     switch (action.type) {
         case cartConstants.CART_ADD_ITEM:
             const item = action.payload;
-            const existItem = state.cartItems.find(x => 
-                x.product === item.product && 
-                x.color === item.color && 
-                x.size === item.size
-            );
+            const existItem = state.cartItems.find(x => x.product === item.product);
             if (existItem) {
                 return { 
                     ...state, 
-                    cartItems: state.cartItems.map(x => 
-                        x.product === existItem.product && 
-                        x.color === existItem.color && 
-                        x.size === existItem.size ? item : x
-                    ) 
+                    cartItems: state.cartItems.map(x => x.product === existItem.product ? item : x) 
                 };
             }
             else {
@@ -30,7 +22,7 @@ export const cartReducer = (state = { cartItems: [], shippingAddress: {} }, acti
         case cartConstants.CART_SAVE_SHIPPING_ADDRESS:
             return { ...state, shippingAddress: action.payload };
         case cartConstants.CART_SAVE_PAYMENT_METHOD:
-            return { ...state, paymentMethod: action.payload }
+            return { ...state, paymentMethod: action.payload };
         case cartConstants.CART_CLEAR_ITEMS:
             return {
                 ...state,

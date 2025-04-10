@@ -7,7 +7,6 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import Meta from '../components/Meta';
 import { listProducts } from '../redux/actions/productActions';
 import Paginate from '../components/Paginate';
-import ProductCarousel from '../components/ProductCarousel';
 import ProductCard from '../components/ProductCard';
 
 // Styles
@@ -57,8 +56,6 @@ const ProductsScreen = () => {
         <div className="products-container">
             <Meta title={t('allProducts')} />
             
-            {!keyword && <ProductCarousel />}
-
             <div className="products-header">
                 <h1 className="products-header-title">{t('allProducts')}</h1>
                 

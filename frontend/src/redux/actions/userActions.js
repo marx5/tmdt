@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from './axiosConfig.js';
 import * as userConstants from '../constants/userConstants';
 import { ORDER_LIST_MY_RESET } from '../constants/orderConstants';
 

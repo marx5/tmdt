@@ -1,5 +1,5 @@
 import * as productConstants from '../constants/productConstants';
-import axios from 'axios';
+import axios from './axiosConfig.js';
 
 // Action creator function
 export const listProducts = (keyword = '', pageNumber = 1, sortOption = '') => {

@@ -1,41 +1,44 @@
 import React from 'react';
-import { LinkContainer } from 'react-router-bootstrap';
 import { Nav } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
+import { useTranslation } from '../hooks/useTranslation';
 
-const CheckoutSteps = (props) => {
-    return <Nav className='justify-content-center mb-4'>
-        <Nav.Item>
-            {props.step1 ? (
-                <LinkContainer to='/login'>
-                    <Nav.Link>Đăng nhập</Nav.Link>
-                </LinkContainer>
-            ) : (<Nav.Link disabled>Đăng nhập</Nav.Link>)}
-        </Nav.Item>
+const CheckoutSteps = ({ step1, step2, step3 }) => {
+    const { t } = useTranslation();
 
-        <Nav.Item>
-            {props.step2 ? (
-                <LinkContainer to='/shipping'>
-                    <Nav.Link>Địa chỉ giao hàng</Nav.Link>
-                </LinkContainer>
-            ) : (<Nav.Link disabled>Địa chỉ giao hàng</Nav.Link>)}
-        </Nav.Item>
+    return (
+        <Nav className='justify-content-center mb-4'>
+            <Nav.Item>
+                {step1 ? (
+                    <LinkContainer to='/cart'>
+                        <Nav.Link>{t('cart')}</Nav.Link>
+                    </LinkContainer>
+                ) : (
+                    <Nav.Link disabled>{t('cart')}</Nav.Link>
+                )}
+            </Nav.Item>
 
-        <Nav.Item>
-            {props.step3 ? (
-                <LinkContainer to='/payment'>
-                    <Nav.Link>Thanh toán</Nav.Link>
-                </LinkContainer>
-            ) : (<Nav.Link disabled>Thanh toán</Nav.Link>)}
-        </Nav.Item>
+            <Nav.Item>
+                {step2 ? (
+                    <LinkContainer to='/shipping'>
+                        <Nav.Link>{t('shipping')}</Nav.Link>
+                    </LinkContainer>
+                ) : (
+                    <Nav.Link disabled>{t('shipping')}</Nav.Link>
+                )}
+            </Nav.Item>
 
-        <Nav.Item>
-            {props.step4 ? (
-                <LinkContainer to='/placeorder'>
-                    <Nav.Link>Đặt hàng</Nav.Link>
-                </LinkContainer>
-            ) : (<Nav.Link disabled>Đặt hàng</Nav.Link>)}
-        </Nav.Item>
-    </Nav>;
+            <Nav.Item>
+                {step3 ? (
+                    <LinkContainer to='/placeorder'>
+                        <Nav.Link>{t('placeOrder')}</Nav.Link>
+                    </LinkContainer>
+                ) : (
+                    <Nav.Link disabled>{t('placeOrder')}</Nav.Link>
+                )}
+            </Nav.Item>
+        </Nav>
+    )
 }
 
 export default CheckoutSteps;

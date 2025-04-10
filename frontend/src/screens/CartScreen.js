@@ -5,6 +5,7 @@ import { Row, Col, ListGroup, Image, Form, Button, Card } from 'react-bootstrap'
 import Message from '../components/Message';
 import { addToCart, removeFromCart } from '../redux/actions/cartActions';
 import { useTranslation } from '../hooks/useTranslation';
+import { BASE_URL } from '../redux/actions/axiosConfig';
 import './CartScreen.scss';
 
 const CartScreen = () => {
@@ -68,7 +69,7 @@ const CartScreen = () => {
                                     <Row className="align-items-center">
                                         <Col md={2}>
                                             <Image 
-                                                src={item.image} 
+                                                src={`${BASE_URL}${item.image}`}
                                                 alt={item.name} 
                                                 fluid 
                                                 rounded 
