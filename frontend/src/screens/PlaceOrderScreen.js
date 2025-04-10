@@ -1,17 +1,18 @@
 import React, { useEffect } from 'react';
 import { Button, Row, Col, ListGroup, Image, Card } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import CheckoutSteps from '../components/CheckoutSteps';
 import Message from '../components/Message';
 import { createOrder } from '../redux/actions/orderActions';
 import { clearCart } from '../redux/actions/cartActions';
 import { useTranslation } from '../hooks/useTranslation';
 
-const PlaceOrderScreen = (props) => {
+const PlaceOrderScreen = () => {
     const cart = useSelector(state => state.cart);
     const dispatch = useDispatch();
     const { t } = useTranslation();
+    const navigate = useNavigate();
 
     // Calculate prices
     const addDecimals = (num) => {
@@ -35,10 +36,10 @@ const PlaceOrderScreen = (props) => {
     useEffect(() => {
         if (success) {
             dispatch(clearCart());
-            props.history.push(`/orders/${order._id}`);
+            navigate(`/orders/${order._id}`);
         }
         // eslint-disable-next-line
-    }, [props.history, success]);
+    }, [success]);
 
     const placeOrderHandler = () => {
         dispatch(

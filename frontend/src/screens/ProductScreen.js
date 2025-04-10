@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Row, Col, Image, ListGroup, Card, Button, Form } from 'react-bootstrap';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Row, Col, Image, ListGroup, Card, Button, Form, Alert } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from '../hooks/useTranslation';
 
@@ -9,9 +9,11 @@ import Rating from '../components/Rating';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Message from '../components/Message';
 import Meta from '../components/Meta';
+import FlyingProduct from '../components/UI/FlyingProduct';
 
 // Redux actions
 import { singleProduct, createReview } from '../redux/actions/productActions';
+import { addToCart, removeFromCart } from '../redux/actions/cartActions';
 
 // Redux constants
 import * as productConstants from '../redux/constants/productConstants';
@@ -19,14 +21,21 @@ import * as productConstants from '../redux/constants/productConstants';
 // Styles
 import './ProductScreen.scss';
 
-const ProductScreen = (props) => {
+const ProductScreen = () => {
     const [qty, setQty] = useState(1);
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
     const [reviewSubmitted, setReviewSubmitted] = useState(false);
     const [selectedColor, setSelectedColor] = useState('');
     const [selectedSize, setSelectedSize] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+    const [showFlyingProduct, setShowFlyingProduct] = useState(false);
+    const [flyingProductProps, setFlyingProductProps] = useState(null);
+    const productImageRef = useRef(null);
+    const cartIconRef = useRef(null);
 
+    const { id } = useParams();
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const { t } = useTranslation();
 
@@ -52,7 +61,6 @@ const ProductScreen = (props) => {
             setRating(0);
             setComment('');
 
-            // Ẩn thông báo sau 5 giây
             const timer = setTimeout(() => {
                 setReviewSubmitted(false);
                 dispatch({ type: productConstants.PRODUCT_CREATE_REVIEW_RESET });
@@ -61,22 +69,55 @@ const ProductScreen = (props) => {
             return () => clearTimeout(timer);
         }
 
-        dispatch(singleProduct(props.match.params.id));
-
-    }, [dispatch, props.match.params.id, createReviewSuccess]);
+        dispatch(singleProduct(id));
+    }, [dispatch, id, createReviewSuccess]);
 
     const addToCartHandler = () => {
-        if (!selectedColor || !selectedSize) {
-            alert('Vui lòng chọn màu sắc và kích thước');
+        if (!selectedColor) {
+            setErrorMessage(t('pleaseSelectColor'));
             return;
         }
-        props.history.push(`/cart/${props.match.params.id}?qty=${qty}&color=${selectedColor}&size=${selectedSize}`);
-    }
+        if (!selectedSize) {
+            setErrorMessage(t('pleaseSelectSize'));
+            return;
+        }
+        setErrorMessage('');
+
+        // Get positions for animation
+        const productImage = productImageRef.current;
+        const cartIcon = cartIconRef.current;
+
+        if (productImage && cartIcon) {
+            const productRect = productImage.getBoundingClientRect();
+            const cartRect = cartIcon.getBoundingClientRect();
+
+            setFlyingProductProps({
+                image: product.image,
+                startPosition: {
+                    x: productRect.left + productRect.width / 2,
+                    y: productRect.top + productRect.height / 2
+                },
+                endPosition: {
+                    x: cartRect.left + cartRect.width / 2,
+                    y: cartRect.top + cartRect.height / 2
+                },
+                onComplete: () => {
+                    setShowFlyingProduct(false);
+                    dispatch(addToCart(id, qty, selectedColor, selectedSize));
+                }
+            });
+
+            setShowFlyingProduct(true);
+        } else {
+            // Fallback if refs are not available
+            dispatch(addToCart(id, qty, selectedColor, selectedSize));
+        }
+    };
 
     const submitHandler = (e) => {
         e.preventDefault();
         dispatch(
-            createReview(props.match.params.id, {
+            createReview(id, {
                 rating,
                 comment,
             })
@@ -97,7 +138,12 @@ const ProductScreen = (props) => {
                     <div className="product-content">
                         <div className="product-gallery">
                             <div className="product-gallery-main">
-                                <Image src={product.image} alt={product.name} fluid />
+                                <Image 
+                                    src={product.image} 
+                                    alt={product.name} 
+                                    fluid 
+                                    ref={productImageRef}
+                                />
                             </div>
                             {product.images && product.images.length > 0 && (
                                 <div className="product-gallery-thumbnails">
@@ -106,6 +152,7 @@ const ProductScreen = (props) => {
                                             key={index} 
                                             src={image} 
                                             alt={`${product.name} ${index + 1}`}
+                                            className={index === 0 ? 'active' : ''}
                                         />
                                     ))}
                                 </div>
@@ -126,6 +173,12 @@ const ProductScreen = (props) => {
                             <div className="product-info-description">
                                 {product.description}
                             </div>
+
+                            {errorMessage && (
+                                <Alert variant="danger" className="mt-3">
+                                    {errorMessage}
+                                </Alert>
+                            )}
 
                             <Card className="product-details">
                                 <ListGroup variant='flush'>
@@ -153,7 +206,10 @@ const ProductScreen = (props) => {
                                                             key={color.name}
                                                             className={`product-colors-item ${selectedColor === color.name ? 'selected' : ''}`}
                                                             style={{ backgroundColor: color.code }}
-                                                            onClick={() => setSelectedColor(color.name)}
+                                                            onClick={() => {
+                                                                setSelectedColor(color.name);
+                                                                setSelectedSize(''); // Reset size when color changes
+                                                            }}
                                                             title={color.name}
                                                         />
                                                     ))}
@@ -198,20 +254,46 @@ const ProductScreen = (props) => {
                                                     </Button>
 
                                                     <Form.Control
+                                                        type="number"
+                                                        min="1"
+                                                        max={selectedSize ? 
+                                                            product.colors
+                                                                .find(c => c.name === selectedColor)
+                                                                .sizes.find(s => s.size === selectedSize).quantity 
+                                                            : product.countInStock}
                                                         value={qty}
                                                         onChange={(e) => {
                                                             const value = Number(e.target.value);
-                                                            if (value > 0 && value <= product.countInStock) {
-                                                                setQty(value);
+                                                            if (value > 0) {
+                                                                const maxQty = selectedSize ? 
+                                                                    product.colors
+                                                                        .find(c => c.name === selectedColor)
+                                                                        .sizes.find(s => s.size === selectedSize).quantity 
+                                                                    : product.countInStock;
+                                                                setQty(Math.min(value, maxQty));
                                                             }
                                                         }}
+                                                        className="product-quantity-input"
                                                     />
 
                                                     <Button
                                                         variant="outline-secondary"
                                                         size="sm"
-                                                        onClick={() => qty < product.countInStock && setQty(Number(qty) + 1)}
-                                                        disabled={qty >= product.countInStock}
+                                                        onClick={() => {
+                                                            const maxQty = selectedSize ? 
+                                                                product.colors
+                                                                    .find(c => c.name === selectedColor)
+                                                                    .sizes.find(s => s.size === selectedSize).quantity 
+                                                                : product.countInStock;
+                                                            if (qty < maxQty) {
+                                                                setQty(Number(qty) + 1);
+                                                            }
+                                                        }}
+                                                        disabled={qty >= (selectedSize ? 
+                                                            product.colors
+                                                                .find(c => c.name === selectedColor)
+                                                                .sizes.find(s => s.size === selectedSize).quantity 
+                                                            : product.countInStock)}
                                                     >
                                                         <i className="fas fa-plus"></i>
                                                     </Button>
@@ -222,10 +304,9 @@ const ProductScreen = (props) => {
 
                                     <ListGroup.Item>
                                         <Button
-                                            className='btn-block'
-                                            type='button'
-                                            disabled={product.countInStock === 0 || !selectedColor || !selectedSize}
+                                            variant="primary"
                                             onClick={addToCartHandler}
+                                            disabled={product.countInStock === 0}
                                         >
                                             {t('addToCart')}
                                         </Button>
@@ -299,8 +380,9 @@ const ProductScreen = (props) => {
                                         type='submit'
                                         variant='primary'
                                         className="product-reviews-form-submit"
+                                        disabled={loadingProductReview}
                                     >
-                                        {t('submit')}
+                                        {loadingProductReview ? t('submitting') : t('submit')}
                                     </Button>
                                 </Form>
                             ) : (
@@ -313,6 +395,14 @@ const ProductScreen = (props) => {
                         </div>
                     </div>
                 </>
+            )}
+
+            {/* Add ref to cart icon in header */}
+            <div ref={cartIconRef} style={{ display: 'none' }} />
+
+            {/* Flying product animation */}
+            {showFlyingProduct && flyingProductProps && (
+                <FlyingProduct {...flyingProductProps} />
             )}
         </div>
     );

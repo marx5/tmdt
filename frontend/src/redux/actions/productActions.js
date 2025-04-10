@@ -2,13 +2,13 @@ import * as productConstants from '../constants/productConstants';
 import axios from 'axios';
 
 // Action creator function
-export const listProducts = () => {
+export const listProducts = (keyword = '', pageNumber = 1, sortOption = '') => {
     return async (dispatch) => {
         try {
             // Starts loading
             dispatch({ type: productConstants.PRODUCT_LIST_REQUEST });
             
-            const res = await axios.get('/api/products');
+            const res = await axios.get(`/api/products?keyword=${keyword}&pageNumber=${pageNumber}&sort=${sortOption}`);
             
             // Loading successful
             dispatch({ type: productConstants.PRODUCT_LIST_SUCCESS, payload: res.data });

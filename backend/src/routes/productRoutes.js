@@ -120,7 +120,10 @@ router.post('/', protect, admin, asyncHandler(async (req, res) => {
         numReviews: 0,
         price: 0,
         countInStock: 0,
+        sizes: [],
         colors: [],
+        sizeQuantities: {},
+        colorQuantities: {},
         isFeatured: false,
         discount: 0,
         tags: [],
@@ -145,19 +148,29 @@ router.put('/:id', protect, admin, asyncHandler(async (req, res) => {
         product.category = req.body.category || product.category;
         product.description = req.body.description || product.description;
         product.price = req.body.price || product.price;
-        product.countInStock = req.body.countInStock || product.countInStock;
+        product.sizes = req.body.sizes || product.sizes;
         product.colors = req.body.colors || product.colors;
+        product.sizeQuantities = req.body.sizeQuantities || product.sizeQuantities;
+        product.colorQuantities = req.body.colorQuantities || product.colorQuantities;
         product.isFeatured = req.body.isFeatured || product.isFeatured;
         product.discount = req.body.discount || product.discount;
         product.tags = req.body.tags || product.tags;
         product.specifications = req.body.specifications || product.specifications;
 
         // Tính toán lại tổng số lượng tồn kho
-        if (product.colors && product.colors.length > 0) {
-            product.countInStock = product.colors.reduce((total, color) => {
-                return total + color.sizes.reduce((sum, size) => sum + size.quantity, 0);
-            }, 0);
+        let totalStock = 0;
+        
+        // Cộng số lượng từ sizeQuantities
+        if (product.sizeQuantities) {
+            totalStock += Object.values(product.sizeQuantities).reduce((sum, quantity) => sum + (quantity || 0), 0);
         }
+        
+        // Cộng số lượng từ colorQuantities
+        if (product.colorQuantities) {
+            totalStock += Object.values(product.colorQuantities).reduce((sum, quantity) => sum + (quantity || 0), 0);
+        }
+        
+        product.countInStock = totalStock;
 
         const updatedProduct = await product.save();
         res.json(updatedProduct);

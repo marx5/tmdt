@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Row, Col, ListGroup, Image, Form, Button, Card } from 'react-bootstrap';
 import Message from '../components/Message';
@@ -7,31 +7,41 @@ import { addToCart, removeFromCart } from '../redux/actions/cartActions';
 import { useTranslation } from '../hooks/useTranslation';
 import './CartScreen.scss';
 
-const CartScreen = (props) => {
-    const productId = props.match.params.id;
-    const qty = props.location.search ? Number(props.location.search.split('=')[1]) : 1;
+const CartScreen = () => {
+    const { id: productId } = useParams();
+    const [searchParams] = useSearchParams();
+    const qty = searchParams.get('qty') ? Number(searchParams.get('qty')) : 1;
+    const color = searchParams.get('color') || '';
+    const size = searchParams.get('size') || '';
     const dispatch = useDispatch();
     const cart = useSelector(state => state.cart);
     const { cartItems } = cart;
     const { t } = useTranslation();
+    const navigate = useNavigate();
+    const userLogin = useSelector(state => state.userLogin);
+    const { userInfo } = userLogin;
 
     useEffect(() => {
         if (productId) {
-            dispatch(addToCart(productId, qty));
+            dispatch(addToCart(productId, qty, color, size));
         }
-    }, [dispatch, productId, qty]);
+    }, [dispatch, productId, qty, color, size]);
 
     const removeFromCartHandler = (id) => {
         dispatch(removeFromCart(id));
     }
 
     const checkoutHandler = () => {
-        props.history.push('/login?redirect=shipping');
+        if (userInfo) {
+            navigate('/shipping');
+        } else {
+            navigate('/login?redirect=shipping');
+        }
     }
 
-    const updateQuantityHandler = (id, newQty, countInStock) => {
+    const updateQuantityHandler = (id, newQty, countInStock, color, size) => {
         if (newQty > 0 && newQty <= countInStock) {
-            dispatch(addToCart(id, Number(newQty)));
+            dispatch(addToCart(id, Number(newQty), color, size));
         }
     }
 
@@ -54,7 +64,7 @@ const CartScreen = (props) => {
                     ) : (
                         <ListGroup variant='flush'>
                             {cartItems.map(item => (
-                                <ListGroup.Item key={item.product} className="cart-item">
+                                <ListGroup.Item key={`${item.product}-${item.color}-${item.size}`} className="cart-item">
                                     <Row className="align-items-center">
                                         <Col md={2}>
                                             <Image 
@@ -83,7 +93,7 @@ const CartScreen = (props) => {
                                                     variant="outline-secondary"
                                                     size="sm"
                                                     className="cart-quantity-button"
-                                                    onClick={() => updateQuantityHandler(item.product, item.qty - 1, item.countInStock)}
+                                                    onClick={() => updateQuantityHandler(item.product, item.qty - 1, item.countInStock, item.color, item.size)}
                                                     disabled={item.qty <= 1}
                                                 >
                                                     <i className="fas fa-minus"></i>
@@ -95,7 +105,7 @@ const CartScreen = (props) => {
                                                     onChange={(e) => {
                                                         const value = Number(e.target.value);
                                                         if (value > 0 && value <= item.countInStock) {
-                                                            updateQuantityHandler(item.product, value, item.countInStock);
+                                                            updateQuantityHandler(item.product, value, item.countInStock, item.color, item.size);
                                                         }
                                                     }}
                                                 />
@@ -104,7 +114,7 @@ const CartScreen = (props) => {
                                                     variant="outline-secondary"
                                                     size="sm"
                                                     className="cart-quantity-button"
-                                                    onClick={() => updateQuantityHandler(item.product, item.qty + 1, item.countInStock)}
+                                                    onClick={() => updateQuantityHandler(item.product, item.qty + 1, item.countInStock, item.color, item.size)}
                                                     disabled={item.qty >= item.countInStock}
                                                 >
                                                     <i className="fas fa-plus"></i>

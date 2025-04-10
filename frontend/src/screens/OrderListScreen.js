@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Table, Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 // Components
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -11,8 +12,9 @@ import Meta from '../components/Meta';
 // Redux actions
 import { allOrders } from '../redux/actions/orderActions';
 
-const OrderListScreen = (props) => {
+const OrderListScreen = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const orderList = useSelector(state => state.orderList);
     const { loading, error, orders } = orderList;
@@ -24,9 +26,9 @@ const OrderListScreen = (props) => {
             dispatch(allOrders());
         }
         else {
-            props.history.push('/login');
+            navigate('/login');
         }
-    }, [dispatch]);
+    }, [dispatch, navigate, userInfo]);
 
     return <>
         <Meta title='Order List' />
