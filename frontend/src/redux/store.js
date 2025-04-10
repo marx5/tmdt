@@ -3,34 +3,54 @@ import thunk from 'redux-thunk';
 import { composeWithDevTools } from 'redux-devtools-extension';
 
 // Reducers
-import { productListReducer, productDetailsReducer, productDeleteReducer, productCreateReducer, productUpdateReducer, productCreateReviewReducer, productTopRatedReducer } from './reducers/productReducers';
+import { 
+    productListReducer, 
+    productDetailsReducer, 
+    productDeleteReducer, 
+    productCreateReducer, 
+    productUpdateReducer, 
+    productCreateReviewReducer, 
+    productTopRatedReducer 
+} from './reducers/productReducers';
 import { cartReducer } from './reducers/cartReducers'; 
-import { userLoginReducer, userRegisterReducer, userDetailsReducer, userUpdateProfileReducer, usersListReducer, userUpdateReducer } from './reducers/userReducers';
-import { orderCreateReducer, orderDetailsReducer, orderPayReducer, orderMyReducer, orderListReducer, orderDeliverReducer } from './reducers/orderReducers';
+import { 
+    userLoginReducer, 
+    userRegisterReducer, 
+    userDetailsReducer, 
+    userUpdateProfileReducer, 
+    usersListReducer, 
+    userUpdateReducer 
+} from './reducers/userReducers';
+import { 
+    orderCreateReducer, 
+    orderDetailsReducer, 
+    orderMyReducer, 
+    orderListReducer, 
+    orderDeliverReducer 
+} from './reducers/orderReducers';
 
 console.log('Setting up Redux store...');
 
 const reducer = combineReducers({
     productList: productListReducer,
     productDetails: productDetailsReducer,
+    productDelete: productDeleteReducer,
+    productCreate: productCreateReducer,
+    productUpdate: productUpdateReducer,
+    productCreateReview: productCreateReviewReducer,
+    productTopRated: productTopRatedReducer,
     cart: cartReducer,
     userLogin: userLoginReducer,
     userRegister: userRegisterReducer,
     userDetails: userDetailsReducer,
     userUpdateProfile: userUpdateProfileReducer,
+    usersList: usersListReducer,
     userUpdate: userUpdateReducer,
     orderCreate: orderCreateReducer,
     orderDetails: orderDetailsReducer,
-    orderPay: orderPayReducer,
-    orderDeliver: orderDeliverReducer,
     orderMy: orderMyReducer,
     orderList: orderListReducer,
-    usersList: usersListReducer,
-    productDelete: productDeleteReducer,
-    productCreate: productCreateReducer,
-    productUpdate: productUpdateReducer,
-    productCreateReview: productCreateReviewReducer,
-    productTopRated: productTopRatedReducer
+    orderDeliver: orderDeliverReducer
 });
 
 // Helper function to safely parse JSON

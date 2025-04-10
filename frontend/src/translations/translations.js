@@ -79,11 +79,6 @@ export const translations = {
         enterCity: 'Enter city',
         enterPostalCode: 'Enter postal code',
 
-        // Payment
-        paymentMethod: 'Payment Method',
-        selectMethod: 'Select Method',
-        paypal: 'PayPal or Credit Card',
-
         // Place Order
         orderSummary: 'Order Summary',
         items: 'Items',
@@ -98,8 +93,6 @@ export const translations = {
         deliveryAddress: 'Delivery Address',
         notDelivered: 'Not Delivered',
         delivered: 'Delivered on',
-        notPaid: 'Not Paid',
-        paidOn: 'Paid on',
         markAsDelivered: 'Mark As Delivered',
 
         // Admin
@@ -145,6 +138,11 @@ export const translations = {
         orderDelivered: 'Order marked as delivered',
         writeYourComment: 'Write your comment here...',
         submitting: 'Submitting...',
+
+        // Payment
+        paymentMethod: 'Payment Method',
+        selectMethod: 'Select Method',
+        cod: 'Cash on Delivery (COD)',
     },
     vi: {
         // Header
@@ -226,11 +224,6 @@ export const translations = {
         enterCity: 'Nhập thành phố',
         enterPostalCode: 'Nhập mã bưu điện',
 
-        // Payment
-        paymentMethod: 'Phương thức thanh toán',
-        selectMethod: 'Chọn phương thức',
-        paypal: 'PayPal hoặc thẻ tín dụng',
-
         // Place Order
         orderSummary: 'Tổng quan đơn hàng',
         items: 'Sản phẩm',
@@ -245,8 +238,6 @@ export const translations = {
         deliveryAddress: 'Địa chỉ giao hàng',
         notDelivered: 'Chưa giao hàng',
         delivered: 'Đã giao hàng vào',
-        notPaid: 'Chưa thanh toán',
-        paidOn: 'Đã thanh toán vào',
         markAsDelivered: 'Đánh dấu là đã giao hàng',
 
         // Admin
@@ -292,6 +283,11 @@ export const translations = {
         orderDelivered: 'Đơn hàng đã được đánh dấu là đã giao',
         writeYourComment: 'Viết bình luận của bạn tại đây...',
         submitting: 'Đang gửi...',
+
+        // Payment
+        paymentMethod: 'Phương thức thanh toán',
+        selectMethod: 'Chọn phương thức',
+        cod: 'Thanh toán khi nhận hàng (COD)',
     },
     zh: {
         // Header
@@ -361,11 +357,6 @@ export const translations = {
         enterCity: '输入城市',
         enterPostalCode: '输入邮政编码',
 
-        // Payment
-        paymentMethod: '支付方式',
-        selectMethod: '选择支付方式',
-        paypal: 'PayPal 或信用卡',
-
         // Place Order
         orderSummary: '订单摘要',
         items: '商品',
@@ -380,8 +371,6 @@ export const translations = {
         deliveryAddress: '送货地址',
         notDelivered: '未送达',
         delivered: '送达日期',
-        notPaid: '未支付',
-        paidOn: '支付日期',
         markAsDelivered: '标记为已送达',
 
         // Admin
@@ -427,5 +416,10 @@ export const translations = {
         orderDelivered: '订单已标记为送达',
         writeYourComment: '在这里写下您的评论...',
         submitting: '提交中...',
+
+        // Payment
+        paymentMethod: '支付方式',
+        selectMethod: '选择支付方式',
+        cod: '货到付款 (COD)',
     }
 }; 

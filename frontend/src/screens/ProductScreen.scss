@@ -24,7 +24,8 @@
             
             img {
                 width: 100%;
-                height: auto;
+                height: 400px;
+                object-fit: cover;
                 border-radius: 8px;
             }
         }
@@ -36,7 +37,8 @@
 
             img {
                 width: 100%;
-                height: auto;
+                height: 100px;
+                object-fit: cover;
                 border-radius: 4px;
                 cursor: pointer;
                 transition: opacity 0.3s;

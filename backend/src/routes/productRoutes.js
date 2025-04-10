@@ -212,10 +212,11 @@ router.post('/:id/reviews', protect, asyncHandler(async (req, res) => {
             )
         );
 
-        if (!hasPurchased) {
-            res.status(403);
-            throw new Error('Bạn cần mua sản phẩm trước khi đánh giá');
-        }
+        // Tạm thời bỏ qua kiểm tra mua hàng để cho phép đánh giá
+        // if (!hasPurchased) {
+        //     res.status(403);
+        //     throw new Error('Bạn cần mua sản phẩm trước khi đánh giá');
+        // }
 
         // Thêm đánh giá
         const review = {
