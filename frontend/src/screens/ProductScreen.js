@@ -3,6 +3,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Row, Col, Image, ListGroup, Card, Button, Form, Alert } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from '../hooks/useTranslation';
+import { BASE_URL } from '../redux/actions/axiosConfig';
 
 // Components
 import Rating from '../components/Rating';
@@ -139,7 +140,7 @@ const ProductScreen = () => {
                         <div className="product-gallery">
                             <div className="product-gallery-main">
                                 <Image 
-                                    src={product.image} 
+                                    src={`${BASE_URL}${product.image}`}
                                     alt={product.name} 
                                     fluid 
                                     ref={productImageRef}
@@ -150,7 +151,7 @@ const ProductScreen = () => {
                                     {product.images.map((image, index) => (
                                         <img 
                                             key={index} 
-                                            src={image} 
+                                            src={`${BASE_URL}${image}`}
                                             alt={`${product.name} ${index + 1}`}
                                             className={index === 0 ? 'active' : ''}
                                         />

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Card, Button } from 'react-bootstrap';
 import Rating from './Rating';
 import { useTranslation } from '../hooks/useTranslation';
+import { BASE_URL } from '../redux/actions/axiosConfig';
 
 // Styles
 import './ProductCard.scss';
@@ -14,7 +15,7 @@ const ProductCard = ({ product }) => {
         <Card className="product-card">
             <Link to={`/product/${product._id}`}>
                 <Card.Img
-                    src={product.image}
+                    src={`${BASE_URL}${product.image}`}
                     variant="top"
                     className="product-card-image"
                 />

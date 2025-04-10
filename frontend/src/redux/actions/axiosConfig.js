@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+const BASE_URL = 'http://localhost:8080';
+
 const axiosConfig = axios.create({
-    baseURL: 'http://localhost:8080',
+    baseURL: BASE_URL,
     headers: {
         'Content-Type': 'application/json',
     },
@@ -24,4 +26,5 @@ axiosConfig.interceptors.request.use(
     }
 );
 
-export default axiosConfig; 
+export default axiosConfig;
+export { BASE_URL }; 

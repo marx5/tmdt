@@ -1,0 +1,65 @@
+.carousel {
+    &-item {
+        transition: transform 0.6s ease-in-out;
+        transform: translateX(0);
+    }
+
+    &-item.carousel-item-next:not(.carousel-item-start),
+    &-item.active.carousel-item-end {
+        transform: translateX(100%);
+    }
+
+    &-item.carousel-item-prev:not(.carousel-item-end),
+    &-item.active.carousel-item-start {
+        transform: translateX(-100%);
+    }
+
+    &-control {
+        &-prev,
+        &-next {
+            width: 5%;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+
+            &:hover {
+                opacity: 1;
+            }
+        }
+
+        &-prev-icon,
+        &-next-icon {
+            width: 2rem;
+            height: 2rem;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            padding: 0.5rem;
+        }
+    }
+
+    &-caption {
+        background-color: rgba(0, 0, 0, 0.5);
+        padding: 1rem;
+        border-radius: 0.5rem;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        width: auto;
+        max-width: 80%;
+
+        h5 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #fff;
+        }
+    }
+}
+
+// Hiệu ứng khi hover vào ảnh
+.carousel-item img {
+    transition: transform 0.3s ease;
+
+    &:hover {
+        transform: scale(1.02);
+    }
+} 
