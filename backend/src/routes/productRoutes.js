@@ -76,12 +76,14 @@ router.post('/', protect, admin, asyncHandler(async (req, res) => {
         user: req.user._id,
         name: 'Sample',
         image: '/images/sample.jpg',
+        images: [],
         brand: 'Sample brand',
         category: 'Sample category',
         description: 'Sample description',
         rating: 0,
         numReviews: 0,
         price: 0,
+        colors: [],
         countInStock: 0
     });
 
@@ -99,11 +101,14 @@ router.put('/:id', protect, admin, asyncHandler(async (req, res) => {
     if (product) {
         product.name = req.body.name;
         product.image = req.body.image;
+        product.images = req.body.images;
         product.brand = req.body.brand;
         product.category = req.body.category;
         product.description = req.body.description;
         product.price = req.body.price;
-        product.countInStock = req.body.countInStock;
+        product.colors = req.body.colors;
+        product.countInStock = req.body.colors.reduce((total, color) => 
+            total + color.sizes.reduce((sum, size) => sum + size.quantity, 0), 0);
 
         await product.save();
         res.status(200);

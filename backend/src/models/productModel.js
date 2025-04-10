@@ -15,6 +15,17 @@ const reviewSchema = mongoose.Schema({
     }
 );
 
+const sizeSchema = mongoose.Schema({
+    size: { type: String, required: true },
+    quantity: { type: Number, required: true, default: 0 }
+});
+
+const colorSchema = mongoose.Schema({
+    name: { type: String, required: true },
+    code: { type: String, required: true },
+    sizes: [sizeSchema]
+});
+
 const productSchema = mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -29,6 +40,9 @@ const productSchema = mongoose.Schema({
         type: String,
         required: true,
     },
+    images: [{
+        type: String
+    }],
     brand: {
         type: String,
         required: true,
@@ -57,6 +71,7 @@ const productSchema = mongoose.Schema({
         required: true,
         default: 0,
     },
+    colors: [colorSchema],
     countInStock: {
         type: Number,
         required: true,
